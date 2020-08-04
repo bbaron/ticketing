@@ -11,6 +11,7 @@
     <modules>
         <module>tickets</module>
         <module>orders</module>
+        <module>config</module>
     </modules>
 
 </project>
