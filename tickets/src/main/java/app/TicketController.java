@@ -2,12 +2,14 @@ package app;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -19,9 +21,11 @@ import static org.springframework.http.ResponseEntity.status;
 public class TicketController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TicketRepository ticketRepository;
+    private final Environment env;
 
-    public TicketController(TicketRepository ticketRepository) {
+    public TicketController(TicketRepository ticketRepository, Environment env) {
         this.ticketRepository = ticketRepository;
+        this.env = env;
     }
 
     @GetMapping
@@ -54,4 +58,11 @@ public class TicketController {
         logger.info("updated {}", ticket);
         return ok(ticket);
     }
+
+    @GetMapping("/messages")
+    Map<String, String> getMessages() {
+        return Map.of("message", env.getProperty("message", "No message"),
+                "ticket-message", env.getProperty("ticket-message", "No ticket message"));
+    }
+
 }
