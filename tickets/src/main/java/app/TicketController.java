@@ -2,6 +2,8 @@ package app;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +24,12 @@ public class TicketController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TicketRepository ticketRepository;
     private final Environment env;
+    private final DiscoveryClient discoveryClient;
 
-    public TicketController(TicketRepository ticketRepository, Environment env) {
+    public TicketController(TicketRepository ticketRepository, Environment env, DiscoveryClient discoveryClient) {
         this.ticketRepository = ticketRepository;
         this.env = env;
+        this.discoveryClient = discoveryClient;
     }
 
     @GetMapping
@@ -65,4 +69,8 @@ public class TicketController {
                 "ticket-message", env.getProperty("ticket-message", "No ticket message"));
     }
 
+    @GetMapping("/service-instances/{appName}")
+    List<ServiceInstance> serviceInstancesByAppName(@PathVariable String appName) {
+        return this.discoveryClient.getInstances(appName);
+    }
 }
