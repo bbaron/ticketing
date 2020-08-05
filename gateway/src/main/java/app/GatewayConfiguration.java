@@ -17,6 +17,9 @@ public class GatewayConfiguration {
                 .route(r -> r.path("/api/orders/**")
                 .uri("lb://ORDERS")
                 .id("orders"))
+                .route(r -> r.path("/api/auth/**")
+                .uri("lb://AUTH")
+                .id("auth"))
                 .build();
     }
 }
