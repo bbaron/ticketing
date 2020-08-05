@@ -1,0 +1,15 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: tickets
+          uri: lb://TICKETS
+          predicates:
+            - Path=/api/tickets/**
+        - id: orders
+          uri: lb://ORDERS
+          predicates:
+            - Path=/api/orders/**
+
