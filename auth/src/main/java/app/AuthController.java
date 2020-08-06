@@ -1,36 +1,50 @@
 package app;
 
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import common.exceptions.RequestValidationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/users")
 public class AuthController {
-    private final DiscoveryClient discoveryClient;
-    private final Environment env;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public AuthController(DiscoveryClient discoveryClient, Environment env) {
-        this.discoveryClient = discoveryClient;
-        this.env = env;
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
-    @GetMapping("/service-instances/{appName}")
-    List<ServiceInstance> serviceInstancesByAppName(@PathVariable String appName) {
-        return this.discoveryClient.getInstances(appName);
+    @PostMapping(path = "/signup")
+    @ResponseStatus(CREATED)
+    public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpSession session) {
+        if (!bindingResult.hasFieldErrors("email")) {
+            if (userRepository.existsByEmail(userRequest.getEmail())) {
+                bindingResult.rejectValue("email", "duplicate-email","Email in use");
+            }
+        }
+        if (bindingResult.hasErrors()) {
+            throw new RequestValidationException(bindingResult);
+        }
+        var user = userRequest.toUser(passwordEncoder);
+        user = userRepository.insert(user);
+        generateJwt(session, user);
+        return user.toUserResponse();
     }
 
-    @GetMapping("/messages")
-    Map<String, String> getMessages() {
-        return Map.of("message", env.getProperty("message", "No message"),
-                "auth-message", env.getProperty("auth-message", "No auth message"));
+
+    private void generateJwt(HttpSession session, User user) {
+        var jwt = jwtUtils.generateJwt(user.getId(), user.getEmail());
+        session.setAttribute("jwt", jwt);
     }
+
 
 }
