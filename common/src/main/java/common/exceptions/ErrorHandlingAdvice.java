@@ -19,7 +19,7 @@ public class ErrorHandlingAdvice extends ResponseEntityExceptionHandler {
     @ResponseBody
     ResponseEntity<ErrorDescriptors> handleCustomException(CustomException ex) {
         HttpStatus status = ex.getHttpStatus();
-        logger.error("handling exception, status = {}", status, ex);
+        logger.warn("handling exception, status = {}", status);
         return new ResponseEntity<>(ex.serializeErrors(), status);
     }
 

@@ -2,7 +2,6 @@ package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.test.MockMvcSetup;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +9,12 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @MockMvcSetup
@@ -47,6 +48,7 @@ class SignupTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.errors[0].field").value("email"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -57,6 +59,7 @@ class SignupTests {
         mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
+                .andExpect(jsonPath("$.errors[0].field").value("email"))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
@@ -78,6 +81,7 @@ class SignupTests {
         mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
+                .andExpect(jsonPath("$.errors[0].field").value("password"))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
 
@@ -87,6 +91,7 @@ class SignupTests {
         mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
+                .andExpect(jsonPath("$.errors[0].field").value("password"))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
@@ -103,6 +108,9 @@ class SignupTests {
                 .session(session)
                 .contentType(APPLICATION_JSON)
                 .content(content))
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.password").doesNotExist())
                 .andDo(print());
         var jwt = (String)session.getAttribute("jwt");
         assertNotNull(jwt);
