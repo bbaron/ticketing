@@ -1,12 +1,11 @@
-package app;
+package ticketing.autoconfigure.web;
 
-import common.exceptions.ErrorHandlingAdvice;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ticketing.exceptions.ErrorHandlingAdvice;
 
 @Configuration
-public class WebConfig {
-
+public class WebAutoConfigure {
     @Bean
     public ErrorHandlingAdvice errorHandlingAdvice() {
         return new ErrorHandlingAdvice();

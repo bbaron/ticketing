@@ -1,13 +1,13 @@
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import common.jwt.JwtUtils;
-import common.test.MockMvcSetup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import ticketing.jwt.JwtUtils;
+import ticketing.test.MockMvcSetup;
 
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;

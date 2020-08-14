@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>ticketing-spring-boot-starter</module>
         <module>common</module>
         <module>tickets</module>
         <module>orders</module>

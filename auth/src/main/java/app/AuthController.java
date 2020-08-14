@@ -1,14 +1,14 @@
 package app;
 
-import common.exceptions.BadCredentialsException;
-import common.exceptions.RequestValidationException;
-import common.jwt.CurrentUserResponse;
-import common.jwt.JwtUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ticketing.autoconfigure.TicketingProperties;
+import ticketing.exceptions.BadCredentialsException;
+import ticketing.exceptions.RequestValidationException;
+import ticketing.jwt.CurrentUserResponse;
+import ticketing.jwt.JwtUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -22,11 +22,14 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final TicketingProperties ticketingProperties;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                          JwtUtils jwtUtils, TicketingProperties ticketingProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.ticketingProperties = ticketingProperties;
     }
 
     @PostMapping(path = "/signup")
@@ -82,9 +85,7 @@ public class AuthController {
 
     private void generateJwt(HttpServletResponse response, User user) {
         var jwt = jwtUtils.generateJwt(user.getId(), user.getEmail());
-        Cookie cookie = new Cookie("jwt", jwt);
-        cookie.setMaxAge(-1);
-        response.addCookie(cookie);
+        response.addHeader(ticketingProperties.getSecurity().getAuthHeaderName(), jwt);
     }
 
 
