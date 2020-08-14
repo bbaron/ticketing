@@ -1,2 +1,21 @@
 server:
   port: 8080
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          netflix:
+            zuul: trace
+spring:
+  mvc:
+    log-request-details: true
+zuul:
+  sensitive-headers: Authorization, Cookie, Set-Cookie
+  routes:
+    auth:
+      path: /auth/**
+      service-id: auth
+  trace-request-body: true
+  include-debug-header: true
+
