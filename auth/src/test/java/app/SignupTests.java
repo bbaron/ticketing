@@ -1,11 +1,10 @@
 package app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import ticketing.autoconfigure.TicketingProperties;
 import ticketing.jwt.JwtUtils;
 import ticketing.test.MockMvcSetup;
 
@@ -25,8 +24,7 @@ class SignupTests {
     @Autowired
     JwtUtils jwtUtils;
     private static final String PATH = "/api/users/signup";
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final TicketingProperties props = new TicketingProperties();
 
     @Test
     @DisplayName("has a route handler listening /api/users/signup for post requests")
@@ -100,21 +98,22 @@ class SignupTests {
     @Test
     @DisplayName("creates user on valid input")
     void test4() throws Exception {
-        MockHttpSession session = new MockHttpSession();
         var email = "asdf@asdf.com";
         String content = String.format("""
                 {"email": "%s", "password": "asdf"}
                 """, email);
-        mvc.perform(post(PATH)
-                .session(session)
+        var response = mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
                 .andExpect(jsonPath("$.email").value(email))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.password").doesNotExist())
-                .andDo(print());
-        var jwt = (String)session.getAttribute("jwt");
+                .andDo(print())
+                .andReturn()
+                .getResponse();
+        var jwt = response.getHeader(props.getSecurity().getAuthHeaderName());
         assertNotNull(jwt);
+
         var currentUserResponse = jwtUtils.verifyJwt(jwt);
         System.out.println(currentUserResponse);
         assertNotNull(currentUserResponse.getCurrentUser());
