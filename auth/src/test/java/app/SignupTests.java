@@ -1,6 +1,7 @@
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import common.jwt.JwtUtils;
 import common.test.MockMvcSetup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

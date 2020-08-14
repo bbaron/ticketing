@@ -1,9 +1,9 @@
-package app;
+package common.jwt;
 
 
 import java.util.Date;
 
-class CurrentUserResponse {
+public class CurrentUserResponse {
     private final CurrentUser currentUser;
 
     public CurrentUser getCurrentUser() {
@@ -22,9 +22,13 @@ class CurrentUserResponse {
         currentUser = null;
     }
 
-    static final CurrentUserResponse NONE = new CurrentUserResponse();
+    public boolean exists() {
+        return currentUser != null;
+    }
 
-    static class CurrentUser {
+    public static final CurrentUserResponse NONE = new CurrentUserResponse();
+
+    public static class CurrentUser {
         private final String id, email;
         private final Date iat;
 

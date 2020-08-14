@@ -1,4 +1,4 @@
-package app;
+package common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -10,9 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Component
 public class JwtUtils {
@@ -29,7 +33,7 @@ public class JwtUtils {
     }
 
 
-    String generateJwt(String id, String email) {
+    public String generateJwt(String id, String email) {
         return Jwts.builder()
                 .setIssuedAt(new Date())
                 .signWith(key)
@@ -38,7 +42,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    CurrentUserResponse verifyJwt(String jwt) {
+    public CurrentUserResponse verifyJwt(String jwt) {
         try {
             Jws<Claims> parsed = Jwts.parserBuilder().setSigningKey(key)
                     .build().parseClaimsJws(jwt);
@@ -53,6 +57,21 @@ public class JwtUtils {
             return CurrentUserResponse.NONE;
         }
     }
+
+    public CurrentUserResponse getCurrentUser(HttpServletRequest request) {
+        return getJwtCookie(request)
+                .map(Cookie::getValue)
+                .map(this::verifyJwt)
+                .orElse(CurrentUserResponse.NONE);
+    }
+
+    public Optional<Cookie> getJwtCookie(HttpServletRequest request) {
+        return Stream.of(request.getCookies())
+                .filter(c -> "jwt".equals(c.getName()))
+                .findFirst();
+    }
+
+
 
     public static void main(String[] args) {
         JwtUtils ju = new JwtUtils(UUID.randomUUID().toString());
