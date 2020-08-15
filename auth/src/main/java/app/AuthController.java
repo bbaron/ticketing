@@ -24,8 +24,10 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final TicketingProperties ticketingProperties;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                          JwtUtils jwtUtils, TicketingProperties ticketingProperties) {
+    public AuthController(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") JwtUtils jwtUtils,
+                          TicketingProperties ticketingProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -36,7 +38,7 @@ public class AuthController {
     @ResponseStatus(CREATED)
     public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpServletResponse response) {
         if (!bindingResult.hasFieldErrors("email")) {
-            if (userRepository.existsByEmail(userRequest.getEmail())) {
+            if (userRepository.existsByEmail(userRequest.email())) {
                 bindingResult.rejectValue("email", "duplicate-email", "Email in use");
             }
         }
@@ -57,11 +59,11 @@ public class AuthController {
             throw new RequestValidationException(bindingResult);
         }
 
-        var user = userRepository.findByEmail(userRequest.getEmail());
+        var user = userRepository.findByEmail(userRequest.email());
         if (user == null) {
             throw new BadCredentialsException();
         }
-        if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(userRequest.password(), user.password())) {
             throw new BadCredentialsException();
         }
         generateJwt(response, user);
@@ -84,7 +86,7 @@ public class AuthController {
 
 
     private void generateJwt(HttpServletResponse response, User user) {
-        var jwt = jwtUtils.generateJwt(user.getId(), user.getEmail());
+        String jwt = jwtUtils.generateJwt(user.id(), user.email());
         response.addHeader(ticketingProperties.getSecurity().getAuthHeaderName(), jwt);
     }
 
