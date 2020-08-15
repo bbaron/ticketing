@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.Http403ForbiddenEntryPoin
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 import ticketing.autoconfigure.TicketingProperties;
+import ticketing.jwt.JwtUtils;
 
 import java.util.Optional;
 
@@ -27,13 +29,15 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     private final HttpSecurityCustomizer httpSecurityCustomizer;
     private final TicketingProperties ticketingProperties;
     private final ObjectMapper objectMapper;
+    private final Environment env;
 
 
     public SecurityAutoConfiguration(TicketingProperties ticketingProperties, @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") ObjectMapper objectMapper,
-                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer) {
+                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer, Environment env) {
         this.httpSecurityCustomizer = httpSecurityCustomizer.orElse(null);
         this.ticketingProperties = ticketingProperties;
         this.objectMapper = objectMapper;
+        this.env = env;
     }
 
     @Override
@@ -83,6 +87,11 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public CustomUserDetailsService customUserDetailsService() {
-        return new CustomUserDetailsService(objectMapper);
+        return new CustomUserDetailsService(jwtUtils());
+    }
+
+    @Bean
+    public JwtUtils jwtUtils() {
+        return new JwtUtils(env);
     }
 }

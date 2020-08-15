@@ -2,6 +2,7 @@ server:
   port: 8080
 logging:
   level:
+    app: trace
     org:
       springframework:
         cloud:
@@ -16,6 +17,9 @@ zuul:
     auth:
       path: /auth/**
       service-id: auth
+    tickets:
+      path: /tickets/**
+      service-id: tickets
   trace-request-body: true
   include-debug-header: true
 

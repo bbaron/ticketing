@@ -10,7 +10,7 @@ import static app.AuthPostFilter.AUTH_INFO;
 
 @Component
 public class AuthPreFilter extends ZuulFilter {
-    private final Logger logger = LoggerFactory.getLogger("PRE LOGGER");
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public AuthPreFilter() {
         logger.info("Constructor for " + getClass());
@@ -33,7 +33,7 @@ public class AuthPreFilter extends ZuulFilter {
 
     @Override
     public Object run() {
-        System.out.println("AUTH PRE FILTER RUN BEGIN " + getClass());
+        logger.trace("AUTH PRE FILTER RUN BEGIN " + getClass());
         var context = RequestContext.getCurrentContext();
         var request = context.getRequest();
         var session = request.getSession(false);
@@ -48,7 +48,7 @@ public class AuthPreFilter extends ZuulFilter {
         } else {
             logger.info("No session available");
         }
-        System.out.println("AUTH PRE FILTER RUN END " + getClass());
+        logger.trace("AUTH PRE FILTER RUN END " + getClass());
         return null;
     }
 }

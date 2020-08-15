@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Component
 public class AuthPostFilter extends ZuulFilter {
-    private final Logger logger = LoggerFactory.getLogger("POST LOGGER");
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     static final String AUTH_INFO = "X-Auth-Info";
     static final String AUTH_SIGNOUT = "X-Auth-Signout";
 
@@ -41,14 +41,11 @@ public class AuthPostFilter extends ZuulFilter {
         var session = context.getRequest().getSession(true);
         var authHeader = context.getOriginResponseHeaders()
                 .stream()
-                .filter(pair -> Objects.equals(AUTH_INFO, pair.first()))
+                .filter(pair -> AUTH_INFO.equalsIgnoreCase(pair.first()))
                 .map(Pair::second)
                 .findFirst();
 
         authHeader.ifPresentOrElse(authInfo -> {
-            context.remove(AUTH_INFO);
-            context.remove(AUTH_INFO.toLowerCase());
-            context.remove(AUTH_INFO.toUpperCase());
             logger.info("setting {} = {} on session {}", AUTH_INFO, authInfo, session.getId());
             session.setAttribute(AUTH_INFO, authInfo);
         }, () -> logger.info("No auth info in response"));

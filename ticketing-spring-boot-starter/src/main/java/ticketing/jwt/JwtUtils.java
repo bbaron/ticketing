@@ -18,12 +18,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@Component
 public class JwtUtils {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final Key key;
 
-    @Autowired
     public JwtUtils(Environment env) {
         this.key = Keys.hmacShaKeyFor(env.getRequiredProperty("jwt-key").getBytes());
     }

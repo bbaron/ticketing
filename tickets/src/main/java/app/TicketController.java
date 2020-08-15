@@ -7,6 +7,8 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ticketing.exceptions.ForbiddenException;
+import ticketing.exceptions.NotFoundException;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -39,7 +41,7 @@ public class TicketController {
 
     @GetMapping("/{id}")
     Ticket findById(@PathVariable String id) {
-        return ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(id + ": no such ticket"));
+        return ticketRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping
@@ -52,7 +54,7 @@ public class TicketController {
 
     @PutMapping("/{id}")
     ResponseEntity<Ticket> update(@RequestBody @Valid TicketRequest request, @PathVariable String id, Principal principal) {
-        var ticket = ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(id + ": no such ticket"));
+        var ticket = ticketRepository.findById(id).orElseThrow(NotFoundException::new);
         if (!Objects.equals(ticket.getUserId(), principal.getName())) {
             throw new ForbiddenException();
         }
@@ -73,4 +75,5 @@ public class TicketController {
     List<ServiceInstance> serviceInstancesByAppName(@PathVariable String appName) {
         return this.discoveryClient.getInstances(appName);
     }
+
 }
