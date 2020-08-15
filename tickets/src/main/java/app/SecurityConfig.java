@@ -4,7 +4,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.stereotype.Component;
 import ticketing.autoconfigure.security.HttpSecurityCustomizer;
 
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 
 @Component
 public class SecurityConfig implements HttpSecurityCustomizer {
@@ -15,8 +15,8 @@ public class SecurityConfig implements HttpSecurityCustomizer {
         http.authorizeRequests()
                 .antMatchers(GET, "/api/tickets").permitAll()
                 .antMatchers(GET, "/api/tickets/*").permitAll()
-                .antMatchers("/api/tickets").authenticated()
-                .antMatchers("/api/tickets/*").authenticated();
+                .antMatchers(POST, "/api/tickets").authenticated()
+                .antMatchers(PUT, "/api/tickets/*").authenticated();
 
     }
 }

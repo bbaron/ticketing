@@ -1,67 +1,52 @@
 package app;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
+import static java.util.Objects.*;
+
 @Document
-public class Ticket {
-    @Id
-    private String id;
-    private String title;
-    private Double price;
-    private String userId;
-
+public record Ticket(
+        @Id
+        @JsonProperty("id")
+        String id,
+        @JsonProperty("title")
+        String title,
+        @JsonProperty("price")
+        Double price,
+        @JsonProperty("userId")
+        String userId
+) {
     public Ticket() {
-
+        this(null, null, null, null);
     }
 
-    public Ticket(TicketRequest ticketRequest, String userId) {
-        this.title = ticketRequest.getTitle();
-        this.price = ticketRequest.getPrice();
-        this.userId = Objects.requireNonNull(userId, "userId is required");
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
+    @PersistenceConstructor
+    public Ticket(String id, String title, Double price, String userId) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    @Override
-    public String toString() {
-        return "Ticket{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", price=" + price +
-                ", userId='" + userId + '\'' +
-                '}';
+    public Ticket(TicketRequest ticketRequest, String userId) {
+        this(null,
+                ticketRequest.getTitle(),
+                ticketRequest.getPrice(),
+                requireNonNull(userId, "userId is required"));
+    }
+
+    @SuppressWarnings("unused")
+    public Ticket withId(String id) {
+        // used by spring data mongo
+        return new Ticket(id, title, price, userId);
+    }
+
+    public Ticket update(String title, Double price) {
+        return new Ticket(id, title, price, userId);
     }
 }

@@ -55,11 +55,10 @@ public class TicketController {
     @PutMapping("/{id}")
     ResponseEntity<Ticket> update(@RequestBody @Valid TicketRequest request, @PathVariable String id, Principal principal) {
         var ticket = ticketRepository.findById(id).orElseThrow(NotFoundException::new);
-        if (!Objects.equals(ticket.getUserId(), principal.getName())) {
+        if (!Objects.equals(ticket.userId(), principal.getName())) {
             throw new ForbiddenException();
         }
-        ticket.setPrice(request.getPrice());
-        ticket.setTitle(request.getTitle());
+        ticket = ticket.update(request.getTitle(), request.getPrice());
         ticket = ticketRepository.save(ticket);
         logger.info("updated {}", ticket);
         return ok(ticket);

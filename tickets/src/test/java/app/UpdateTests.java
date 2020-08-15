@@ -63,7 +63,7 @@ class UpdateTests {
                 .getContentAsString();
         Ticket ticket = objectMapper.readValue(response, Ticket.class);
 
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.id())
                 .with(user("user2"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
@@ -92,7 +92,7 @@ class UpdateTests {
         request = """
                 {"price": 10}
                 """;
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.id())
                 .contentType(APPLICATION_JSON)
                 .content(request))
                 .andDo(print())
@@ -120,7 +120,7 @@ class UpdateTests {
         request = """
                 {"price": -10, "title": "asdf"}
                 """;
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.id())
                 .contentType(APPLICATION_JSON)
                 .content(request))
                 .andDo(print())
@@ -147,7 +147,7 @@ class UpdateTests {
         request = """
                 {"title": "qwerty", "price": 30}
                 """;
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.id())
                 .contentType(APPLICATION_JSON)
                 .content(request))
                 .andDo(print())
