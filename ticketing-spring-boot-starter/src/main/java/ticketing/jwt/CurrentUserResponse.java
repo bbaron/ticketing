@@ -22,10 +22,6 @@ public class CurrentUserResponse {
         currentUser = null;
     }
 
-    public boolean exists() {
-        return currentUser != null;
-    }
-
     public static final CurrentUserResponse NONE = new CurrentUserResponse();
 
     public static class CurrentUser {

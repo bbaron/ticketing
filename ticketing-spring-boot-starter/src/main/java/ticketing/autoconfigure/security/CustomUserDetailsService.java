@@ -23,7 +23,7 @@ public class CustomUserDetailsService extends PreAuthenticatedGrantedAuthorities
         if (user == null) {
             throw new ForbiddenException();
         }
-        return new CustomUserDetails(user.getId(), user.getEmail(), authorities);
+        return new CustomUserDetails(user.getId(), user.getEmail(), user.getIat(), authorities);
     }
 
 }

@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SignupTests {
     @Autowired
     MockMvc mvc;
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     JwtUtils jwtUtils;
     private static final String PATH = "/api/users/signup";
@@ -113,6 +114,7 @@ class SignupTests {
                 .getResponse();
         var jwt = response.getHeader(props.getSecurity().getAuthHeaderName());
         assertNotNull(jwt);
+        assertNotNull(jwtUtils);
 
         var currentUserResponse = jwtUtils.verifyJwt(jwt);
         System.out.println(currentUserResponse);

@@ -38,10 +38,15 @@ public class AuthPreFilter extends ZuulFilter {
         var request = context.getRequest();
         var session = request.getSession(false);
         if (session != null) {
-            var authInfo = session.getAttribute(AUTH_INFO);
-            if (authInfo != null) {
-                logger.info("setting header {} = {} on request", AUTH_INFO, authInfo);
-                context.addZuulRequestHeader(AUTH_INFO, authInfo.toString());
+            Object authObj = session.getAttribute(AUTH_INFO);
+            if (authObj != null) {
+                String authInfo = authObj.toString();
+                if ("SIGNED_OUT".equalsIgnoreCase(authInfo)) {
+                    logger.info("current user is logged out");
+                } else {
+                    logger.info("setting header {} = {} on request", AUTH_INFO, authInfo);
+                    context.addZuulRequestHeader(AUTH_INFO, authInfo);
+                }
             } else {
                 logger.info("No auth info available");
             }

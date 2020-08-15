@@ -3,16 +3,21 @@ package ticketing.autoconfigure.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ticketing.jwt.CurrentUserResponse;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
     private final String userId;
+    private final Date iat;
 
-    public CustomUserDetails(String id, String email, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(String id, String email, Date iat,
+                             Collection<? extends GrantedAuthority> authorities) {
         this.userId = id;
         this.email = email;
+        this.iat = iat;
         this.authorities = List.copyOf(authorities);
     }
 
@@ -20,17 +25,18 @@ public class CustomUserDetails implements UserDetails {
         return email;
     }
 
+    public Date getIat() {
+        return iat;
+    }
+
     private final String email;
     private final List<GrantedAuthority> authorities;
 
-    public CustomUserDetails(String userId, String email, String role) {
+    public CustomUserDetails(String userId, String email, Date iat, String role) {
         this.userId = userId;
         this.email = email;
+        this.iat = iat;
         this.authorities = List.of(new SimpleGrantedAuthority(role));
-    }
-
-    public CustomUserDetails(String userId, String email) {
-        this(userId, email, "ROLE_USER");
     }
 
     @Override
@@ -66,6 +72,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public CurrentUserResponse toCurrentUserResponse() {
+        return new CurrentUserResponse(userId, email, iat);
     }
 
 }

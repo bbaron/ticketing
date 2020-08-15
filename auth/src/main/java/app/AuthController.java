@@ -1,15 +1,16 @@
 package app;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ticketing.autoconfigure.TicketingProperties;
+import ticketing.autoconfigure.security.CustomUserDetails;
 import ticketing.exceptions.BadCredentialsException;
 import ticketing.exceptions.RequestValidationException;
 import ticketing.jwt.CurrentUserResponse;
 import ticketing.jwt.JwtUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -47,7 +48,7 @@ public class AuthController {
         }
         var user = userRequest.toUser(passwordEncoder);
         user = userRepository.insert(user);
-        generateJwt(response, user);
+        sendAuthInfo(response, generateJwt(user));
         return user.toUserResponse();
     }
 
@@ -66,28 +67,31 @@ public class AuthController {
         if (!passwordEncoder.matches(userRequest.password(), user.password())) {
             throw new BadCredentialsException();
         }
-        generateJwt(response, user);
+        sendAuthInfo(response, generateJwt(user));
         return user.toUserResponse();
     }
 
     @GetMapping(path = "/currentuser")
-    public CurrentUserResponse currentUser(HttpServletRequest request) {
-        return jwtUtils.getCurrentUser(request);
+    public CurrentUserResponse currentUser(@AuthenticationPrincipal CustomUserDetails user) {
+        if (user == null) {
+            return CurrentUserResponse.NONE;
+        }
+        return user.toCurrentUserResponse();
     }
 
     @RequestMapping(path = "/signout")
     @ResponseStatus(OK)
-    public void signout(HttpServletRequest request, HttpServletResponse response) {
-        jwtUtils.getJwtCookie(request).ifPresent(c -> {
-            c.setMaxAge(0);
-            response.addCookie(c);
-        });
+    public void signout(HttpServletResponse response) {
+        sendAuthInfo(response, "SIGNED_OUT");
     }
 
 
-    private void generateJwt(HttpServletResponse response, User user) {
-        String jwt = jwtUtils.generateJwt(user.id(), user.email());
-        response.addHeader(ticketingProperties.getSecurity().getAuthHeaderName(), jwt);
+    private String generateJwt(User user) {
+        return jwtUtils.generateJwt(user.id(), user.email());
+    }
+
+    private void sendAuthInfo(HttpServletResponse response, String value) {
+        response.addHeader(ticketingProperties.getSecurity().getAuthHeaderName(), value);
     }
 
 
