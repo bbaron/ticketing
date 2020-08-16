@@ -20,6 +20,9 @@ zuul:
     tickets:
       path: /tickets/**
       service-id: tickets
+    orders:
+      path: /orders/**
+      service-id: orders
   trace-request-body: true
   include-debug-header: true
 
