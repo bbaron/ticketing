@@ -1,6 +1,9 @@
 package ticketing.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
 
 @ConfigurationProperties(prefix = "ticketing")
 public class TicketingProperties {
@@ -27,6 +30,15 @@ public class TicketingProperties {
         public boolean enabled = true;
         public String authHeaderName = "x-auth-info";
         public String authSensitiveHeaderName = "x-auth-info-sensitive";
+        public String jwtKey;
+
+        public String getJwtKey() {
+            return jwtKey;
+        }
+
+        public void setJwtKey(String jwtKey) {
+            this.jwtKey = jwtKey;
+        }
 
         public boolean isEnabled() {
             return enabled;
@@ -78,5 +90,10 @@ public class TicketingProperties {
     @Override
     public String toString() {
         return "TicketingProperties{security=%s}".formatted(security);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        Assert.hasLength(security.jwtKey, "jwt-key is a required property");
     }
 }

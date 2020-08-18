@@ -1,12 +1,10 @@
 package ticketing.autoconfigure.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,16 +26,11 @@ import java.util.Optional;
 public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     private final HttpSecurityCustomizer httpSecurityCustomizer;
     private final TicketingProperties ticketingProperties;
-    private final ObjectMapper objectMapper;
-    private final Environment env;
 
-
-    public SecurityAutoConfiguration(TicketingProperties ticketingProperties, @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") ObjectMapper objectMapper,
-                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer, Environment env) {
+    public SecurityAutoConfiguration(TicketingProperties ticketingProperties,
+                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer) {
         this.httpSecurityCustomizer = httpSecurityCustomizer.orElse(null);
         this.ticketingProperties = ticketingProperties;
-        this.objectMapper = objectMapper;
-        this.env = env;
     }
 
     @Override
@@ -48,8 +41,8 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilter(requestHeaderAuthenticationFilter())
-        .csrf().disable()
-        .exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
+                .csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
 
         if (httpSecurityCustomizer != null) {
             httpSecurityCustomizer.customize(http);
@@ -74,7 +67,7 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider(){
+    public PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider() {
         var provider = new PreAuthenticatedAuthenticationProvider();
         provider.setPreAuthenticatedUserDetailsService(customUserDetailsService());
         return provider;
@@ -92,6 +85,6 @@ public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtUtils jwtUtils() {
-        return new JwtUtils(env);
+        return new JwtUtils(ticketingProperties);
     }
 }
