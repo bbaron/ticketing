@@ -19,7 +19,11 @@ public class SecurityConfig implements HttpSecurityCustomizer {
         http.httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers("/api/users/**").permitAll()
-                .antMatchers("/**").denyAll();
+                .antMatchers("/signin").permitAll()
+                .antMatchers("/signup").permitAll()
+                .antMatchers("/signout").permitAll()
+                .antMatchers("/currentuser").permitAll()
+                .antMatchers("/**").permitAll();
 
     }
 }

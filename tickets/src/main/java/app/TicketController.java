@@ -23,7 +23,7 @@ import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping(path = "/api/tickets")
+@RequestMapping(path = {"/api/tickets", "/", ""})
 public class TicketController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TicketRepository ticketRepository;

@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(path = {"/api/users", "/", ""})
 public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

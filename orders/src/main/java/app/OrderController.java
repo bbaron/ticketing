@@ -25,7 +25,7 @@ import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping(path = "/api/orders")
+@RequestMapping(path = {"/api/orders", "/", ""})
 public class OrderController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private static final int EXPIRATION_WINDOW_SECONDS = 60 * 15;

@@ -12,7 +12,6 @@ public class SecurityConfig implements HttpSecurityCustomizer {
     @Override
     public void customize(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/api/orders").authenticated()
-                .antMatchers("/api/orders/*").authenticated();
+                .antMatchers("/**").authenticated();
     }
 }

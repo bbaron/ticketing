@@ -15,13 +15,13 @@ zuul:
   sensitive-headers: Authorization, Cookie, Set-Cookie
   routes:
     auth:
-      path: /auth/**
+      path: /api/users/**
       service-id: auth
     tickets:
-      path: /tickets/**
+      path: /api/tickets/**
       service-id: tickets
     orders:
-      path: /orders/**
+      path: /api/orders/**
       service-id: orders
   trace-request-body: true
   include-debug-header: true
