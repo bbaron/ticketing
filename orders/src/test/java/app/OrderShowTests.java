@@ -1,16 +1,14 @@
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-
 import ticketing.events.types.OrderStatus;
 import ticketing.test.MockMvcSetup;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,7 +27,7 @@ class OrderShowTests {
     ObjectMapper objectMapper;
 
     private Ticket buildTicket() {
-        var ticket = new Ticket("concert", 20.0);
+        var ticket = new Ticket("concert", 20);
         return ticketRepository.save(ticket);
     }
 

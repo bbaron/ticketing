@@ -58,9 +58,9 @@ public class OrderResponse {
     public static class TicketResponse {
         private final String id;
         private final String title;
-        private final Double price;
+        private final Integer price;
 
-        public TicketResponse(String id, String title, Double price) {
+        public TicketResponse(String id, String title, Integer price) {
             this.id = id;
             this.title = title;
             this.price = price;
@@ -74,7 +74,7 @@ public class OrderResponse {
             return title;
         }
 
-        public Double getPrice() {
+        public Integer getPrice() {
             return price;
         }
 

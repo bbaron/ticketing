@@ -6,9 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import ticketing.events.Messenger;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -18,9 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class UpdateTests {
+class TicketUpdateTests {
     @Autowired
     MockMvc mvc;
+    @MockBean
+    Messenger messenger;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -143,15 +151,20 @@ class UpdateTests {
                 .getResponse()
                 .getContentAsString();
         Ticket ticket = objectMapper.readValue(response, Ticket.class);
-
+        reset(messenger);
+        var title = "qwerty";
         request = """
-                {"title": "qwerty", "price": 30}
-                """;
+                {"title": "%s", "price": 30}
+                """.formatted(title);
         mvc.perform(put("/api/tickets/{id}", ticket.getId())
                 .contentType(APPLICATION_JSON)
                 .content(request))
                 .andDo(print())
                 .andExpect(status().is(200));
+        verify(messenger).convertAndSend(anyString(), anyString(),
+                contains("""
+                        "title":"%s"
+                        """.formatted(title).strip()));
     }
 
 }

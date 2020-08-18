@@ -4,7 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "ticketing")
 public class TicketingProperties {
-    private Security security = new Security();
+    public Security security = new Security();
+    public Events events = new Events();
 
     public Security getSecurity() {
         return security;
@@ -14,10 +15,18 @@ public class TicketingProperties {
         this.security = security;
     }
 
+    public Events getEvents() {
+        return events;
+    }
+
+    public void setEvents(Events events) {
+        this.events = events;
+    }
+
     public static class Security {
-        private boolean enabled = true;
-        private String authHeaderName = "x-auth-info";
-        private String authSensitiveHeaderName = "x-auth-info-sensitive";
+        public boolean enabled = true;
+        public String authHeaderName = "x-auth-info";
+        public String authSensitiveHeaderName = "x-auth-info-sensitive";
 
         public boolean isEnabled() {
             return enabled;
@@ -45,13 +54,29 @@ public class TicketingProperties {
 
         @Override
         public String toString() {
-            return String.format("Security{enabled=%s, authHeaderName='%s', authSensitiveHeaderName='%s'}",
-                    enabled, authHeaderName, authSensitiveHeaderName);
+            return "Security{enabled=%s, authHeaderName='%s', authSensitiveHeaderName='%s'}"
+                    .formatted(enabled, authHeaderName, authSensitiveHeaderName);
         }
     }
 
+    public static class Events {
+        public String exchange = "ticketing";
+
+        public String getExchange() {
+            return exchange;
+        }
+
+        public void setExchange(String exchange) {
+            this.exchange = exchange;
+        }
+
+        @Override
+        public String toString() {
+            return "Events{exchange='%s'}".formatted(exchange);
+        }
+    }
     @Override
     public String toString() {
-        return String.format("TicketingProperties{security=%s}", security);
+        return "TicketingProperties{security=%s}".formatted(security);
     }
 }

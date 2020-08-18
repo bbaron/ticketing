@@ -13,7 +13,7 @@ public class Ticket{
         @Id
         String id;
         String title;
-        Double price;
+        Integer price;
         String userId;
         @Version
         Long version;
@@ -22,7 +22,7 @@ public class Ticket{
     }
 
     @PersistenceConstructor
-    public Ticket(String id, String title, Double price, String userId, Long version) {
+    public Ticket(String id, String title, Integer price, String userId, Long version) {
         this.id = id;
         this.title = title;
         this.price = price;
@@ -44,7 +44,7 @@ public class Ticket{
         return new Ticket(id, title, price, userId, version);
     }
 
-    public Ticket update(String title, Double price) {
+    public Ticket update(String title, Integer price) {
         return new Ticket(id, title, price, userId, version);
     }
 
@@ -64,11 +64,11 @@ public class Ticket{
         this.title = title;
     }
 
-    public Double getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
@@ -78,5 +78,10 @@ public class Ticket{
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d}".formatted(id, title, price, userId, version);
     }
 }

@@ -13,13 +13,13 @@ public record TicketRequest(
         @Min(1)
         @NotNull
         @JsonProperty("price")
-        Double price
+        Integer price
 ) {
     public String getTitle() {
         return title;
     }
 
-    public Double getPrice() {
+    public Integer getPrice() {
         return price;
     }
 

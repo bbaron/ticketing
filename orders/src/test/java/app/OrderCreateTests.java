@@ -59,7 +59,7 @@ class OrderCreateTests {
     @DisplayName("errors if ticket is reserved")
     @WithMockUser
     void errors_if_ticket_is_reserved() throws Exception {
-        var ticket = new Ticket("concert", 20.0);
+        var ticket = new Ticket("concert", 20);
         ticket = ticketRepository.save(ticket);
         var ticketId = ticket.getId();
         var order = new Order("user", OrderStatus.Created, new Date(), ticket);
@@ -79,7 +79,7 @@ class OrderCreateTests {
     @DisplayName("reserves a ticket")
     @WithMockUser
     void reserves_a_ticket() throws Exception {
-        var ticket = new Ticket("concert", 20.0);
+        var ticket = new Ticket("concert", 20);
         ticket = ticketRepository.save(ticket);
 
         var content = """

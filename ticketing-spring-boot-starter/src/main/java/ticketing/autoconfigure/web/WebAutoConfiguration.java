@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import ticketing.exceptions.ErrorHandlingAdvice;
 
 @Configuration
-public class WebAutoConfigure {
+public class WebAutoConfiguration {
     @Bean
     public ErrorHandlingAdvice errorHandlingAdvice() {
         return new ErrorHandlingAdvice();

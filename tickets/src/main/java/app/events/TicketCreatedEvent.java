@@ -1,38 +1,27 @@
-package app;
+package app.events;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
-import org.springframework.data.mongodb.core.mapping.Document;
+import ticketing.events.Event;
 
-@Document
 @SuppressWarnings("unused")
-public class Ticket {
-    @Id
-    public String id;
-    public String title;
+public class TicketCreatedEvent implements Event {
+    public String id, title, userId;
     public Integer price;
-    @Version
     public Long version;
 
-    public Ticket() {
+    public TicketCreatedEvent() {
     }
 
-    public Ticket(String title, Integer price) {
-        this.title = title;
-        this.price = price;
-    }
-
-    public Ticket(String id, String title, Integer price) {
+    public TicketCreatedEvent(String id, String title, String userId, Integer price, Long version) {
         this.id = id;
         this.title = title;
-        this.price = price;
-    }
-
-    public Ticket(String id, String title, Integer price, Long version) {
-        this.id = id;
-        this.title = title;
+        this.userId = userId;
         this.price = price;
         this.version = version;
+    }
+
+    @Override
+    public String id() {
+        return id;
     }
 
     public String getId() {
@@ -49,6 +38,14 @@ public class Ticket {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public Integer getPrice() {
@@ -69,6 +66,7 @@ public class Ticket {
 
     @Override
     public String toString() {
-        return "Ticket{id='%s', title='%s', price=%s, version=%d}".formatted(id, title, price, version);
+        return "TicketCreatedEvent{id='%s', title='%s', userId='%s', price=%s, version=%d}".formatted(id, title, userId, price, version);
     }
+
 }
