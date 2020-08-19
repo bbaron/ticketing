@@ -23,6 +23,9 @@ zuul:
     orders:
       path: /api/orders/**
       service-id: orders
+    client:
+      path: /**
+      url: http://localhost:3000
   trace-request-body: true
   include-debug-header: true
 
