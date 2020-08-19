@@ -79,7 +79,7 @@ public class OrderController {
         logger.info("expiration: " + expiration);
         var userId = principal.getName();
         var order = new Order(userId, OrderStatus.Created, expiration, ticket);
-        order = orderRepository.save(order);
+        order = orderRepository.insert(order);
         logger.info("Saved " + order);
 
         return status(CREATED).body(new OrderResponse(order));

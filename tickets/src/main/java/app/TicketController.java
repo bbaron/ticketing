@@ -54,7 +54,7 @@ public class TicketController {
             throw new RequestValidationException(result);
         }
         var ticket = new Ticket(request, principal.getName());
-        ticket = ticketRepository.save(ticket);
+        ticket = ticketRepository.insert(ticket);
         logger.info("saved {}", ticket);
         var event = new TicketCreatedEvent(ticket.id, ticket.title, ticket.userId, ticket.price, ticket.version);
         ticketCreatedPublisher.publish(event);
