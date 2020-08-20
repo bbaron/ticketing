@@ -38,6 +38,9 @@ public class AuthController {
     @PostMapping(path = "/signup")
     @ResponseStatus(CREATED)
     public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpServletResponse response) {
+        if ("blow@up.com".equals(userRequest.email())) {
+            throw new IllegalStateException("What happens on this exception?");
+        }
         if (!bindingResult.hasFieldErrors("email")) {
             if (userRepository.existsByEmail(userRequest.email())) {
                 bindingResult.rejectValue("email", "duplicate-email", "Email in use");

@@ -10,13 +10,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public record UserRequest(
-        @NotNull
+        @NotBlank
         @Email
         @JsonProperty("email")
         String email,
 
-        @NotBlank
         @Size(min = 4, max = 20)
+        @NotNull
         @JsonProperty("password")
         String password
 ) {
