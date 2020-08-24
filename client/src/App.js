@@ -25,9 +25,15 @@ function App() {
         <Header currentUser={currentUser} />
         <Switch>
           <Route path="/" exact component={LandingPage} />
-          <Route path="/auth/signup" component={Signup} />
-          <Route path="/auth/signin" component={Signin} />
-          <Route path="/auth/signout" component={Signout} />
+          <Route path="/auth/signin">
+            <Signin setRefreshUser={setRefreshUser} />
+          </Route>
+          <Route path="/auth/signup">
+            <Signup setRefreshUser={setRefreshUser} />
+          </Route>
+          <Route path="/auth/signout">
+            <Signout setRefreshUser={setRefreshUser} />
+          </Route>
         </Switch>
       </BrowserRouter>
     </div>

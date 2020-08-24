@@ -13,6 +13,10 @@ export default ({ url, method, body, onSuccess }) => {
       }
       return response.data;
     } catch (err) {
+      if (!err.response) {
+        console.error(err);
+        return;
+      }
       const res = err.response;
       if (!res.data.errors) {
         let message;

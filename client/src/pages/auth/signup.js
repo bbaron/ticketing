@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import useRequest from "../../hooks/use-request";
 import { setAuthInfo } from "../../components/auth-info";
+import { useHistory } from "react-router-dom";
 
-const Signup = ({ history }) => {
+const Signup = ({ setRefreshUser }) => {
+  let history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { doRequest, errors } = useRequest({
@@ -14,7 +16,8 @@ const Signup = ({ history }) => {
     },
     onSuccess: (response) => {
       setAuthInfo(response.headers["x-auth-info"]);
-      return history.push("/");
+      history.push("/");
+      setRefreshUser(true);
     },
   });
 

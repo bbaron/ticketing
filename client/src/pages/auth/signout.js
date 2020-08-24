@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import useRequest from "../../hooks/use-request";
 import { removeAuthInfo } from "../../components/auth-info";
+import { useHistory } from "react-router-dom";
 
-const Signout = ({ history }) => {
+const Signout = ({ setRefreshUser }) => {
+  let history = useHistory();
   const { doRequest } = useRequest({
     url: "/api/users/signout",
     method: "post",
@@ -10,6 +12,7 @@ const Signout = ({ history }) => {
     onSuccess: () => {
       removeAuthInfo();
       history.push("/");
+      setRefreshUser(true);
     },
   });
   useEffect(() => {
