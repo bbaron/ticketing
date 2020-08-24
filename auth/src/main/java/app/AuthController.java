@@ -1,5 +1,7 @@
 package app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -20,6 +22,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping(path = {"/api/users", "/", ""})
 public class AuthController {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
@@ -27,7 +30,7 @@ public class AuthController {
 
     public AuthController(UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
-                          @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") JwtUtils jwtUtils,
+                          JwtUtils jwtUtils,
                           TicketingProperties ticketingProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -85,6 +88,7 @@ public class AuthController {
     @RequestMapping(path = "/signout")
     @ResponseStatus(OK)
     public void signout(HttpServletResponse response) {
+        logger.info("Signing out current user");
         sendAuthInfo(response, "SIGNED_OUT");
     }
 
