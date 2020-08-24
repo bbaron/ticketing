@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+
 import useRequest from "../../hooks/use-request";
 import { setAuthInfo } from "../../components/auth-info";
 
-const Signup = ({ history }) => {
+const Signin = ({ history }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { doRequest, errors } = useRequest({
-    url: "/api/users/signup",
+    url: "/api/users/signin",
     method: "post",
     body: {
       email,
@@ -14,7 +15,7 @@ const Signup = ({ history }) => {
     },
     onSuccess: (response) => {
       setAuthInfo(response.headers["x-auth-info"]);
-      return history.push("/");
+      history.push("/");
     },
   });
 
@@ -25,7 +26,7 @@ const Signup = ({ history }) => {
 
   return (
     <form onSubmit={onSubmit}>
-      <h1>Sign Up</h1>
+      <h1>Sign In</h1>
       <div className="form-group">
         <label htmlFor="user-email">Email Address</label>
         <input
@@ -51,9 +52,9 @@ const Signup = ({ history }) => {
         />
       </div>
       {errors}
-      <button className="btn btn-primary">Sign Up</button>
+      <button className="btn btn-primary">Sign In</button>
     </form>
   );
 };
 
-export default Signup;
+export default Signin;

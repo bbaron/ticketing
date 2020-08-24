@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -38,6 +39,11 @@ public class JwtUtils {
     }
 
     public CurrentUserResponse verifyJwt(String jwt) {
+        log.info("jwt = " + jwt);
+        if (Objects.toString(jwt, "").isBlank()) {
+            log.info("jwt is null or blank");
+            return CurrentUserResponse.NONE;
+        }
         try {
             Jws<Claims> parsed = Jwts.parserBuilder().setSigningKey(key)
                     .build().parseClaimsJws(jwt);
@@ -53,6 +59,7 @@ public class JwtUtils {
         }
     }
 
+    @SuppressWarnings("unused")
     public CurrentUserResponse getCurrentUser(HttpServletRequest request) {
         return getJwtCookie(request)
                 .map(Cookie::getValue)

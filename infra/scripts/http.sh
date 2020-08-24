@@ -1,19 +1,29 @@
 #!/bin/bash
 
-session="asdf$$"
-email="$session@asdf.com"
+#session=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 8 | head -n 1)
+#email="$session@asdf.com"
+session='asdf'
+email="asdf@asdf.com"
 content_type="Content-Type:application/json"
 port='8080'
 HTTP='http --body'
 JQ='jq -r'
 
 # signup
-user_id=$($HTTP "--session=$session" POST ":$port/api/users/signup" "$content_type"  "email=$email" 'password=asdf' | $JQ .id)
+user_id=$($HTTP "--session=$session" POST ":$port/api/users/signin" "$content_type"  "email=$email" 'password=asdf' | $JQ .id)
 echo "signed up user_id = $user_id"
 $HTTP "--session=$session" ":$port/api/users/currentuser"
 
 # create ticket
 ticket_id=$($HTTP "--session=$session" POST ":$port/api/tickets" "$content_type"  "title=concert ($session)" 'price=10' | $JQ .id)
+if [[ "$ticket_id" = 'null' ]]
+then
+  echo 'ticket_id is null'
+  exit 1
+else
+  echo "ticket_id is $ticket_id"
+  exit 0
+fi
 echo "created ticket_id = $ticket_id"
 $HTTP "--session=$session" ":$port/api/tickets/$ticket_id"
 

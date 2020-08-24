@@ -11,6 +11,7 @@ logging:
 spring:
   mvc:
     log-request-details: true
+    log-resolved-exception: true
 zuul:
   sensitive-headers: Authorization, Cookie, Set-Cookie
   routes:

@@ -1,34 +1,34 @@
-import React from "react";
-import { BrowserRouter, Route, Link } from "react-router-dom";
-import Signup from "./pages/auth/signup";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
-
-const PageOne = () => {
-  return (
-    <div>
-      PageOne
-      <Link to="/pageTwo">Nav to page 2</Link>
-    </div>
-  );
-};
-const PageTwo = () => {
-  return (
-    <div>
-      PageTwo
-      <Link to="/">Nav to page 1</Link>
-    </div>
-  );
-};
+import api from "./api/build-client";
+import Signup from "./pages/auth/signup";
+import Signin from "./pages/auth/signin";
+import Header from "./components/header";
+import LandingPage from "./pages";
+import Signout from "./pages/auth/signout";
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [refreshUser, setRefreshUser] = useState(true);
+  useEffect(() => {
+    if (!refreshUser) return;
+    (async function () {
+      const { data } = await api().get("/api/users/currentuser");
+      setCurrentUser(data["currentUser"]);
+      setRefreshUser(false);
+    })();
+  }, [refreshUser]);
   return (
     <div className="container" style={{ marginTop: "10px" }}>
       <BrowserRouter>
-        <div>
-          <Route path="/" exact component={PageOne} />
-          <Route path="/pageTwo" component={PageTwo} />
+        <Header currentUser={currentUser} />
+        <Switch>
+          <Route path="/" exact component={LandingPage} />
           <Route path="/auth/signup" component={Signup} />
-        </div>
+          <Route path="/auth/signin" component={Signin} />
+          <Route path="/auth/signout" component={Signout} />
+        </Switch>
       </BrowserRouter>
     </div>
   );
