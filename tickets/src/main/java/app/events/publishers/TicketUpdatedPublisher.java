@@ -1,4 +1,4 @@
-package app.events;
+package app.events.publishers;
 
 import org.springframework.stereotype.Component;
 import ticketing.autoconfigure.TicketingProperties;
@@ -7,16 +7,16 @@ import ticketing.events.Messenger;
 import ticketing.events.Subject;
 import ticketing.json.JsonOperations;
 
-import static ticketing.events.Subject.TicketCreated;
+import static ticketing.events.Subject.TicketUpdated;
 
 @Component
-public class TicketCreatedPublisher extends BasePublisher<TicketCreatedEvent> {
-    public TicketCreatedPublisher(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {
+public class TicketUpdatedPublisher extends BasePublisher<TicketUpdatedEvent> {
+    public TicketUpdatedPublisher(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {
         super(messenger, jsonOperations, properties.events.exchange);
     }
 
     @Override
     protected Subject subject() {
-        return TicketCreated;
+        return TicketUpdated;
     }
 }

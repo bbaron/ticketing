@@ -9,14 +9,15 @@ import static java.util.Objects.requireNonNull;
 
 @SuppressWarnings("unused")
 @Document
-public class Ticket{
-        @Id
-        String id;
-        String title;
-        Integer price;
-        String userId;
-        @Version
-        Long version;
+public class Ticket {
+    @Id
+    public String id;
+    public String title;
+    public Integer price;
+    public String userId;
+    @Version
+    public Long version;
+    public String orderId;
 
     public Ticket() {
     }
@@ -28,6 +29,7 @@ public class Ticket{
         this.price = price;
         this.userId = userId;
         this.version = version;
+        this.orderId = null;
     }
 
     public Ticket(TicketRequest ticketRequest, String userId) {
@@ -38,14 +40,26 @@ public class Ticket{
                 null);
     }
 
-    @SuppressWarnings("unused")
+    public Ticket(String id, String title, Integer price, String userId, Long version, String orderId) {
+        this.id = id;
+        this.title = title;
+        this.price = price;
+        this.userId = userId;
+        this.version = version;
+        this.orderId = orderId;
+    }
+
     public Ticket withId(String id) {
         // used by spring data mongo
-        return new Ticket(id, title, price, userId, version);
+        return new Ticket(id, title, price, userId, version, orderId);
+    }
+
+    public Ticket withOrderId(String orderId) {
+        return new Ticket(id, title, price, userId, version, orderId);
     }
 
     public Ticket update(String title, Integer price) {
-        return new Ticket(id, title, price, userId, version);
+        return new Ticket(id, title, price, userId, version, orderId);
     }
 
     public String getId() {
@@ -80,8 +94,24 @@ public class Ticket{
         this.userId = userId;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
-        return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d}".formatted(id, title, price, userId, version);
+        return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d, orderId=%s}".formatted(id, title, price, userId, version, orderId);
     }
 }

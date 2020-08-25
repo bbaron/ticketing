@@ -1,20 +1,19 @@
-package app.events;
+package app.events.listeners;
 
 import ticketing.events.Event;
 
-public class TicketUpdatedEvent implements Event {
+@SuppressWarnings("unused")
+public class TicketCreatedEvent implements Event {
     public String id, title;
     public Integer price;
-    public Long version;
 
-    public TicketUpdatedEvent() {
+    public TicketCreatedEvent() {
     }
 
-    public TicketUpdatedEvent(String id, String title, Integer price, Long version) {
+    public TicketCreatedEvent(String id, String title, Integer price) {
         this.id = id;
         this.title = title;
         this.price = price;
-        this.version = version;
     }
 
     @Override
@@ -48,6 +47,6 @@ public class TicketUpdatedEvent implements Event {
 
     @Override
     public String toString() {
-        return "TicketUpdatedEvent{id='%s', title='%s', price=%s, version=%s}".formatted(id, title, price, version);
+        return "TicketCreatedEvent{id='%s', title='%s', price=%s}".formatted(id, title,  price);
     }
 }

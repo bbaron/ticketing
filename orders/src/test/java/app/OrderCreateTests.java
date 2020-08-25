@@ -4,13 +4,17 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import ticketing.events.Messenger;
 import ticketing.events.types.OrderStatus;
 import ticketing.test.MockMvcSetup;
 
 import java.util.Date;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -24,6 +28,8 @@ class OrderCreateTests {
     TicketRepository ticketRepository;
     @Autowired
     OrderRepository orderRepository;
+    @MockBean
+    Messenger messenger;
 
     @Test
     @DisplayName("ticketId must be a valid mongo id")
@@ -90,6 +96,8 @@ class OrderCreateTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().isCreated());
+
+        verify(messenger).convertAndSend(anyString(), anyString(), anyString());
     }
 
 }

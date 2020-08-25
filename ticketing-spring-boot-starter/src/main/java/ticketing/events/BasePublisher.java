@@ -2,6 +2,7 @@ package ticketing.events;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ticketing.autoconfigure.TicketingProperties;
 import ticketing.json.JsonOperations;
 
 public abstract class BasePublisher<E extends Event> {
@@ -17,6 +18,10 @@ public abstract class BasePublisher<E extends Event> {
         this.messenger = messenger;
         this.jsonOperations = jsonOperations;
         this.exchange = exchange;
+    }
+
+    protected BasePublisher(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {
+        this(messenger, jsonOperations, properties.events.exchange);
     }
 
     public final void publish(E event) {

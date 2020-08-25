@@ -1,9 +1,9 @@
 package app;
 
-import app.events.TicketCreatedEvent;
-import app.events.TicketCreatedPublisher;
-import app.events.TicketUpdatedEvent;
-import app.events.TicketUpdatedPublisher;
+import app.events.publishers.TicketCreatedEvent;
+import app.events.publishers.TicketCreatedPublisher;
+import app.events.publishers.TicketUpdatedEvent;
+import app.events.publishers.TicketUpdatedPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +75,8 @@ public class TicketController {
         ticket = ticket.update(request.getTitle(), request.getPrice());
         ticket = ticketRepository.save(ticket);
         logger.info("updated {}", ticket);
-        var event = new TicketUpdatedEvent(ticket.id, ticket.title, ticket.userId, ticket.price, ticket.version);
+        var event = new TicketUpdatedEvent(ticket.id, ticket.title, ticket.userId,
+                ticket.price, ticket.version, ticket.orderId);
         ticketUpdatedPublisher.publish(event);
         return ok(ticket);
     }

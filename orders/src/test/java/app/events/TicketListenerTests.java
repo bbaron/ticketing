@@ -2,6 +2,10 @@ package app.events;
 
 import app.Ticket;
 import app.TicketRepository;
+import app.events.listeners.TicketCreatedEvent;
+import app.events.listeners.TicketCreatedListener;
+import app.events.listeners.TicketUpdatedEvent;
+import app.events.listeners.TicketUpdatedListener;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

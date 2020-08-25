@@ -12,14 +12,14 @@ import java.util.Date;
 @Document
 public class Order {
     @Id
-    private String id;
-    private String userId;
-    private OrderStatus status;
-    private Date expiration;
+    public String id;
+    public String userId;
+    public OrderStatus status;
+    public Date expiration;
     @Version
-    private Long version;
+    public Long version;
     @DBRef
-    private Ticket ticket;
+    public Ticket ticket;
 
     public Order() {
     }

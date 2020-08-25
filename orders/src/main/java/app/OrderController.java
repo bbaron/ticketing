@@ -1,5 +1,9 @@
 package app;
 
+import app.events.publishers.OrderCancelledEvent;
+import app.events.publishers.OrderCancelledPublisher;
+import app.events.publishers.OrderCreatedEvent;
+import app.events.publishers.OrderCreatedPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -16,7 +20,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -31,10 +34,15 @@ public class OrderController {
     private static final int EXPIRATION_WINDOW_SECONDS = 60 * 15;
     private final OrderRepository orderRepository;
     private final TicketRepository ticketRepository;
+    private final OrderCreatedPublisher orderCreatedPublisher;
+    private final OrderCancelledPublisher orderCancelledPublisher;
 
-    public OrderController(OrderRepository orderRepository, TicketRepository ticketRepository) {
+    public OrderController(OrderRepository orderRepository, TicketRepository ticketRepository,
+                           OrderCreatedPublisher orderCreatedPublisher, OrderCancelledPublisher orderCancelledPublisher) {
         this.orderRepository = orderRepository;
         this.ticketRepository = ticketRepository;
+        this.orderCreatedPublisher = orderCreatedPublisher;
+        this.orderCancelledPublisher = orderCancelledPublisher;
     }
 
     @GetMapping
@@ -55,6 +63,8 @@ public class OrderController {
         if (method.equals(HttpMethod.DELETE)) {
             order.setStatus(OrderStatus.Cancelled);
             orderRepository.save(order);
+            var event = new OrderCancelledEvent(order.id, order.version, order.ticket.id);
+            orderCancelledPublisher.publish(event);
         }
         return new OrderResponse(order);
     }
@@ -81,6 +91,10 @@ public class OrderController {
         var order = new Order(userId, OrderStatus.Created, expiration, ticket);
         order = orderRepository.insert(order);
         logger.info("Saved " + order);
+
+        var event = new OrderCreatedEvent(order.id, order.userId, order.expiration, order.version,
+                order.status, ticket.id, ticket.price);
+        orderCreatedPublisher.publish(event);
 
         return status(CREATED).body(new OrderResponse(order));
     }

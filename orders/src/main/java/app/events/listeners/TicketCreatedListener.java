@@ -1,8 +1,7 @@
-package app.events;
+package app.events.listeners;
 
 import app.Ticket;
 import app.TicketRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import ticketing.events.BaseListener;
 import ticketing.json.JsonOperations;

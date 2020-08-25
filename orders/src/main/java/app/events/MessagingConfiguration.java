@@ -1,5 +1,7 @@
 package app.events;
 
+import app.events.listeners.TicketCreatedListener;
+import app.events.listeners.TicketUpdatedListener;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -15,8 +17,8 @@ import ticketing.autoconfigure.TicketingProperties;
 @Configuration
 public class MessagingConfiguration {
 
-    static final String TICKET_CREATED_QUEUE = "ticket-created";
-    static final String TICKET_UPDATED_QUEUE = "ticket-updated";
+    static final String TICKET_CREATED_QUEUE = "orders.ticket-created";
+    static final String TICKET_UPDATED_QUEUE = "orders.ticket-updated";
     private final TicketingProperties properties;
 
     public MessagingConfiguration(TicketingProperties properties) {

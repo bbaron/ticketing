@@ -1,4 +1,4 @@
-package app.events;
+package app.events.listeners;
 
 import app.Ticket;
 import app.TicketRepository;

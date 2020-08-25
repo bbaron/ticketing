@@ -1,22 +1,25 @@
-package app.events;
+package app.events.publishers;
 
 import ticketing.events.Event;
 
 @SuppressWarnings("unused")
-public class TicketCreatedEvent implements Event {
+public class TicketUpdatedEvent implements Event {
     public String id, title, userId;
     public Integer price;
     public Long version;
+    public String orderId;
 
-    public TicketCreatedEvent() {
+    public TicketUpdatedEvent() {
     }
 
-    public TicketCreatedEvent(String id, String title, String userId, Integer price, Long version) {
+    public TicketUpdatedEvent(String id, String title, String userId,
+                              Integer price, Long version, String orderId) {
         this.id = id;
         this.title = title;
         this.userId = userId;
         this.price = price;
         this.version = version;
+        this.orderId = orderId;
     }
 
     @Override
@@ -64,9 +67,18 @@ public class TicketCreatedEvent implements Event {
         this.version = version;
     }
 
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
-        return "TicketCreatedEvent{id='%s', title='%s', userId='%s', price=%s, version=%d}".formatted(id, title, userId, price, version);
+        return "TicketUpdatedEvent{id=%s, title='%s', userId=%s, price=%s, version=%d, orderId=%s}"
+                .formatted(id, title, userId, price, version, orderId);
     }
 
 }
