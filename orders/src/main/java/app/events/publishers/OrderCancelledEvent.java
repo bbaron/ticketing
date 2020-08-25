@@ -1,9 +1,6 @@
 package app.events.publishers;
 
-import ticketing.events.Event;
-import ticketing.events.types.OrderStatus;
-
-import java.util.Date;
+import ticketing.common.events.Event;
 
 @SuppressWarnings("unused")
 public class OrderCancelledEvent implements Event {

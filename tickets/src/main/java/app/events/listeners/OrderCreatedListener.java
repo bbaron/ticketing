@@ -2,8 +2,8 @@ package app.events.listeners;
 
 import app.TicketRepository;
 import org.springframework.stereotype.Component;
-import ticketing.events.BaseListener;
-import ticketing.json.JsonOperations;
+import ticketing.common.events.BaseListener;
+import ticketing.common.json.JsonOperations;
 
 @Component
 public class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {

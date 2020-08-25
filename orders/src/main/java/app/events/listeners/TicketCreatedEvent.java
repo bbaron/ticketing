@@ -1,6 +1,6 @@
 package app.events.listeners;
 
-import ticketing.events.Event;
+import ticketing.common.events.Event;
 
 @SuppressWarnings("unused")
 public class TicketCreatedEvent implements Event {

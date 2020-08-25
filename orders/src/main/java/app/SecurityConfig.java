@@ -2,9 +2,7 @@ package app;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.stereotype.Component;
-import ticketing.autoconfigure.security.HttpSecurityCustomizer;
-
-import static org.springframework.http.HttpMethod.GET;
+import ticketing.common.autoconfigure.security.HttpSecurityCustomizer;
 
 @Component
 public class SecurityConfig implements HttpSecurityCustomizer {

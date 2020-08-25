@@ -1,13 +1,13 @@
 package app.events.publishers;
 
 import org.springframework.stereotype.Component;
-import ticketing.autoconfigure.TicketingProperties;
-import ticketing.events.BasePublisher;
-import ticketing.events.Messenger;
-import ticketing.events.Subject;
-import ticketing.json.JsonOperations;
+import ticketing.common.autoconfigure.TicketingProperties;
+import ticketing.common.events.BasePublisher;
+import ticketing.common.events.Messenger;
+import ticketing.common.events.Subject;
+import ticketing.common.json.JsonOperations;
 
-import static ticketing.events.Subject.TicketUpdated;
+import static ticketing.common.events.Subject.TicketUpdated;
 
 @Component
 public class TicketUpdatedPublisher extends BasePublisher<TicketUpdatedEvent> {

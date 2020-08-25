@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.events.types.OrderStatus;
-import ticketing.test.MockMvcSetup;
+import ticketing.common.events.types.OrderStatus;
+import ticketing.common.test.MockMvcSetup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;

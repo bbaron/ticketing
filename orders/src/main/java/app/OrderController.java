@@ -10,11 +10,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ticketing.events.types.OrderStatus;
-import ticketing.exceptions.BadRequestException;
-import ticketing.exceptions.ForbiddenException;
-import ticketing.exceptions.NotFoundException;
-import ticketing.exceptions.RequestValidationException;
+import ticketing.common.events.types.OrderStatus;
+import ticketing.common.exceptions.BadRequestException;
+import ticketing.common.exceptions.ForbiddenException;
+import ticketing.common.exceptions.NotFoundException;
+import ticketing.common.exceptions.RequestValidationException;
 
 import javax.validation.Valid;
 import java.security.Principal;

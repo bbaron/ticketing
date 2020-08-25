@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ticketing.exceptions.ForbiddenException;
-import ticketing.exceptions.NotFoundException;
-import ticketing.exceptions.RequestValidationException;
+import ticketing.common.exceptions.ForbiddenException;
+import ticketing.common.exceptions.NotFoundException;
+import ticketing.common.exceptions.RequestValidationException;
 
 import javax.validation.Valid;
 import java.security.Principal;

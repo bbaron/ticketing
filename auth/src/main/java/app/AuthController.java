@@ -6,12 +6,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ticketing.autoconfigure.TicketingProperties;
-import ticketing.autoconfigure.security.CustomUserDetails;
-import ticketing.exceptions.BadCredentialsException;
-import ticketing.exceptions.RequestValidationException;
-import ticketing.jwt.CurrentUserResponse;
-import ticketing.jwt.JwtUtils;
+import ticketing.common.autoconfigure.TicketingProperties;
+import ticketing.common.autoconfigure.security.CustomUserDetails;
+import ticketing.common.exceptions.BadCredentialsException;
+import ticketing.common.exceptions.RequestValidationException;
+import ticketing.common.jwt.CurrentUserResponse;
+import ticketing.common.jwt.JwtUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;

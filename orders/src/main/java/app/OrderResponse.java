@@ -1,6 +1,6 @@
 package app;
 
-import ticketing.events.types.OrderStatus;
+import ticketing.common.events.types.OrderStatus;
 
 import java.util.Date;
 

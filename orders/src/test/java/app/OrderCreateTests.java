@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.events.Messenger;
-import ticketing.events.types.OrderStatus;
-import ticketing.test.MockMvcSetup;
+import ticketing.common.events.Messenger;
+import ticketing.common.events.types.OrderStatus;
+import ticketing.common.test.MockMvcSetup;
 
 import java.util.Date;
 

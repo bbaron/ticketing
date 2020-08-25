@@ -1,7 +1,7 @@
 package app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ticketing.validation.MongoId;
+import ticketing.common.validation.MongoId;
 
 import javax.validation.constraints.NotNull;
 

@@ -2,7 +2,7 @@ package app;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ticketing.exceptions.NotFoundException;
+import ticketing.common.exceptions.NotFoundException;
 
 @RestController
 public class IndexController {

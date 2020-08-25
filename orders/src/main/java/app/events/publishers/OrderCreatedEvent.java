@@ -1,7 +1,7 @@
 package app.events.publishers;
 
-import ticketing.events.Event;
-import ticketing.events.types.OrderStatus;
+import ticketing.common.events.Event;
+import ticketing.common.events.types.OrderStatus;
 
 import java.util.Date;
 

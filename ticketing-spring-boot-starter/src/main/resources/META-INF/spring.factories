@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=ticketing.autoconfigure.TicketingAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=ticketing.common.autoconfigure.TicketingAutoConfiguration

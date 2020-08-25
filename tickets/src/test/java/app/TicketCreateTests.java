@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.events.Messenger;
-import ticketing.test.MockMvcSetup;
+import ticketing.common.events.Messenger;
+import ticketing.common.test.MockMvcSetup;
 
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.contains;

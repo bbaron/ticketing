@@ -4,9 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.autoconfigure.TicketingProperties;
-import ticketing.jwt.JwtUtils;
-import ticketing.test.MockMvcSetup;
+import ticketing.common.autoconfigure.TicketingProperties;
+import ticketing.common.jwt.JwtUtils;
+import ticketing.common.test.MockMvcSetup;
 
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;

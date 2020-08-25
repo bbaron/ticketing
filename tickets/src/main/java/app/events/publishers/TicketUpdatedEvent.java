@@ -1,6 +1,6 @@
 package app.events.publishers;
 
-import ticketing.events.Event;
+import ticketing.common.events.Event;
 
 @SuppressWarnings("unused")
 public class TicketUpdatedEvent implements Event {
