@@ -5,7 +5,6 @@ import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-@SuppressWarnings("unused")
 public class Ticket {
     @Id
     public String id;
@@ -13,13 +12,9 @@ public class Ticket {
     public Integer price;
     @Version
     public Long version;
+    public String orderId;
 
     public Ticket() {
-    }
-
-    public Ticket(String title, Integer price) {
-        this.title = title;
-        this.price = price;
     }
 
     public Ticket(String id, String title, Integer price) {
@@ -67,8 +62,16 @@ public class Ticket {
         this.version = version;
     }
 
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
-        return "Ticket{id='%s', title='%s', price=%s, version=%d}".formatted(id, title, price, version);
+        return "Ticket{id=%s, title='%s', price=%s, version=%d, orderId=%s}".formatted(id, title, price, version, orderId);
     }
 }

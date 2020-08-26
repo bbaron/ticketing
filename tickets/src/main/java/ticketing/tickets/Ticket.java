@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,7 +24,7 @@ public class Ticket {
     }
 
     @PersistenceConstructor
-    public Ticket(String id, String title, Integer price, String userId, Long version) {
+    public Ticket(@Nullable String id, String title, Integer price, String userId, @Nullable Long version) {
         this.id = id;
         this.title = title;
         this.price = price;

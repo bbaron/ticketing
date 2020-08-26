@@ -17,7 +17,7 @@ public class OrderCancelledPublisher extends BasePublisher<OrderCancelledEvent> 
     }
 
     @Override
-    protected Subject subject() {
+    public Subject subject() {
         return OrderCancelled;
     }
 }

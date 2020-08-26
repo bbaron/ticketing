@@ -5,14 +5,12 @@ import org.slf4j.LoggerFactory;
 import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.common.json.JsonOperations;
 
-public abstract class BasePublisher<E extends Event> {
+public abstract class BasePublisher<E extends Event> implements Publisher<E> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Messenger messenger;
     private final JsonOperations jsonOperations;
 
     private final String exchange;
-
-    protected abstract Subject subject();
 
     protected BasePublisher(Messenger messenger, JsonOperations jsonOperations, String exchange) {
         this.messenger = messenger;
@@ -24,6 +22,7 @@ public abstract class BasePublisher<E extends Event> {
         this(messenger, jsonOperations, properties.events.exchange);
     }
 
+    @Override
     public final void publish(E event) {
         var routingKey = event.routingKey(subject());
         logger.info("publishing exchange: {}, route: {} {}", exchange, routingKey, event);

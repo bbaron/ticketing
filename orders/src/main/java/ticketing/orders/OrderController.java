@@ -1,9 +1,5 @@
 package ticketing.orders;
 
-import ticketing.orders.events.publishers.OrderCancelledEvent;
-import ticketing.orders.events.publishers.OrderCancelledPublisher;
-import ticketing.orders.events.publishers.OrderCreatedEvent;
-import ticketing.orders.events.publishers.OrderCreatedPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -25,7 +21,8 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.status;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping(path = {"/api/orders", "/", ""})
@@ -34,15 +31,10 @@ public class OrderController {
     private static final int EXPIRATION_WINDOW_SECONDS = 60 * 15;
     private final OrderRepository orderRepository;
     private final TicketRepository ticketRepository;
-    private final OrderCreatedPublisher orderCreatedPublisher;
-    private final OrderCancelledPublisher orderCancelledPublisher;
 
-    public OrderController(OrderRepository orderRepository, TicketRepository ticketRepository,
-                           OrderCreatedPublisher orderCreatedPublisher, OrderCancelledPublisher orderCancelledPublisher) {
+    public OrderController(OrderRepository orderRepository, TicketRepository ticketRepository) {
         this.orderRepository = orderRepository;
         this.ticketRepository = ticketRepository;
-        this.orderCreatedPublisher = orderCreatedPublisher;
-        this.orderCancelledPublisher = orderCancelledPublisher;
     }
 
     @GetMapping
@@ -63,8 +55,6 @@ public class OrderController {
         if (method.equals(HttpMethod.DELETE)) {
             order.setStatus(OrderStatus.Cancelled);
             orderRepository.save(order);
-            var event = new OrderCancelledEvent(order.id, order.version, order.ticket.id);
-            orderCancelledPublisher.publish(event);
         }
         return new OrderResponse(order);
     }
@@ -91,10 +81,6 @@ public class OrderController {
         var order = new Order(userId, OrderStatus.Created, expiration, ticket);
         order = orderRepository.insert(order);
         logger.info("Saved " + order);
-
-        var event = new OrderCreatedEvent(order.id, order.userId, order.expiration, order.version,
-                order.status, ticket.id, ticket.price);
-        orderCreatedPublisher.publish(event);
 
         return status(CREATED).body(new OrderResponse(order));
     }

@@ -1,5 +1,6 @@
 package ticketing.orders.events.listeners;
 
+import org.springframework.data.domain.Example;
 import ticketing.orders.Ticket;
 import ticketing.orders.TicketRepository;
 import org.springframework.stereotype.Component;
@@ -17,11 +18,14 @@ public class TicketUpdatedListener extends BaseListener<TicketUpdatedEvent> {
 
     @Override
     protected void onMessage(TicketUpdatedEvent event) {
-        logger.info("onMessage: " + event);
-        Ticket ticket = ticketRepository.findDistinctByIdAndVersion(event.id, event.version - 1)
+        var example = new Ticket();
+        example.setId(event.id);
+        example.setVersion(event.version - 1);
+        Ticket ticket = ticketRepository.findOne(Example.of(example))
                 .orElseThrow(() -> new IllegalStateException("ticket not found from " + event));
         ticket.setTitle(event.title);
         ticket.setPrice(event.price);
+        ticket.setOrderId(event.orderId);
         ticketRepository.save(ticket);
     }
 }

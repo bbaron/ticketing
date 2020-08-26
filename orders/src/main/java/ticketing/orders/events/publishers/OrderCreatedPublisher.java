@@ -17,7 +17,7 @@ public class OrderCreatedPublisher extends BasePublisher<OrderCreatedEvent> {
     }
 
     @Override
-    protected Subject subject() {
+    public Subject subject() {
         return OrderCreated;
     }
 }

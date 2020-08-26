@@ -1,9 +1,5 @@
 package ticketing.tickets;
 
-import ticketing.tickets.events.publishers.TicketCreatedEvent;
-import ticketing.tickets.events.publishers.TicketCreatedPublisher;
-import ticketing.tickets.events.publishers.TicketUpdatedEvent;
-import ticketing.tickets.events.publishers.TicketUpdatedPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +23,9 @@ import static org.springframework.http.ResponseEntity.status;
 public class TicketController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TicketRepository ticketRepository;
-    private final TicketCreatedPublisher ticketCreatedPublisher;
-    private final TicketUpdatedPublisher ticketUpdatedPublisher;
 
-    public TicketController(TicketRepository ticketRepository,
-                            TicketCreatedPublisher ticketCreatedPublisher,
-                            TicketUpdatedPublisher ticketUpdatedPublisher) {
+    public TicketController(TicketRepository ticketRepository) {
         this.ticketRepository = ticketRepository;
-        this.ticketCreatedPublisher = ticketCreatedPublisher;
-        this.ticketUpdatedPublisher = ticketUpdatedPublisher;
     }
 
     @GetMapping
@@ -56,8 +46,6 @@ public class TicketController {
         var ticket = new Ticket(request, principal.getName());
         ticket = ticketRepository.insert(ticket);
         logger.info("saved {}", ticket);
-        var event = new TicketCreatedEvent(ticket.id, ticket.title, ticket.userId, ticket.price, ticket.version);
-        ticketCreatedPublisher.publish(event);
         return status(CREATED).body(ticket);
     }
 
@@ -75,9 +63,6 @@ public class TicketController {
         ticket = ticket.update(request.getTitle(), request.getPrice());
         ticket = ticketRepository.save(ticket);
         logger.info("updated {}", ticket);
-        var event = new TicketUpdatedEvent(ticket.id, ticket.title, ticket.userId,
-                ticket.price, ticket.version, ticket.orderId);
-        ticketUpdatedPublisher.publish(event);
         return ok(ticket);
     }
 

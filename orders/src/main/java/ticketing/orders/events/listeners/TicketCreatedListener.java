@@ -17,7 +17,6 @@ public class TicketCreatedListener extends BaseListener<TicketCreatedEvent> {
 
     @Override
     protected void onMessage(TicketCreatedEvent event) {
-        logger.info("onMessage: " + event);
         Ticket ticket = new Ticket(event.id, event.title, event.price);
         ticketRepository.save(ticket);
     }

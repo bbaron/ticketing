@@ -1,22 +1,13 @@
 package ticketing.tickets.events.publishers;
 
-import org.springframework.stereotype.Component;
-import ticketing.common.autoconfigure.TicketingProperties;
-import ticketing.common.events.BasePublisher;
-import ticketing.common.events.Messenger;
+import ticketing.common.events.Publisher;
 import ticketing.common.events.Subject;
-import ticketing.common.json.JsonOperations;
 
-import static ticketing.common.events.Subject.TicketUpdated;
+import static ticketing.common.events.Subject.*;
 
-@Component
-public class TicketUpdatedPublisher extends BasePublisher<TicketUpdatedEvent> {
-    public TicketUpdatedPublisher(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {
-        super(messenger, jsonOperations, properties.events.exchange);
-    }
-
+public interface TicketUpdatedPublisher extends Publisher<TicketUpdatedEvent> {
     @Override
-    protected Subject subject() {
+    default Subject subject() {
         return TicketUpdated;
     }
 }

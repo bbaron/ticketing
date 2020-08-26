@@ -15,8 +15,8 @@ public abstract class BaseListener<E> {
     }
 
     public void receiveMessage(String message) {
-        logger.info("receiveMessage: " + message);
         E event = jsonOperations.readValue(message, eventClass);
+        logger.info("receiveMessage: " + event);
         onMessage(event);
     }
 
