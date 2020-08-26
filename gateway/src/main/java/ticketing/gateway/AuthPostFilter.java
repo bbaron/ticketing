@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class AuthPostFilter extends ZuulFilter {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     static final String AUTH_INFO = "X-Auth-Info";
