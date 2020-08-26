@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.events.types.OrderStatus;
+import ticketing.common.mongodb.MongoTicketingListener;
 import ticketing.common.test.MockMvcSetup;
 import ticketing.orders.OrderRepository;
 import ticketing.orders.OrderResponse;
@@ -20,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @MockMvcSetup
+@MockBean(AbstractMongoEventListener.class)
 class OrderShowTests {
     @Autowired
     MockMvc mvc;

@@ -1,9 +1,12 @@
 package ticketing.tickets.events;
 
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
 import ticketing.tickets.TicketRequest;
@@ -13,6 +16,7 @@ import ticketing.tickets.events.listeners.OrderCreatedListener;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@MockBean(AbstractMongoEventListener.class)
 public class OrderListenerTests {
     @Autowired
     OrderCreatedListener orderCreatedListener;

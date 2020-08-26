@@ -4,7 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
 
@@ -12,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@MockBean(AbstractMongoEventListener.class)
 class TicketVersionTests {
     @Autowired
     TicketRepository repository;

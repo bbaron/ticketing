@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ticketing.common.mongodb.AbstractOnInsertOrUpdateMongoEventListener;
 import ticketing.common.mongodb.AfterInsertEvent;
 import ticketing.common.mongodb.AfterUpdateEvent;
+import ticketing.common.mongodb.MongoTicketingListener;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.events.publishers.TicketCreatedEvent;
 import ticketing.tickets.events.publishers.TicketCreatedPublisher;
@@ -11,7 +12,7 @@ import ticketing.tickets.events.publishers.TicketUpdatedEvent;
 import ticketing.tickets.events.publishers.TicketUpdatedPublisher;
 
 @Component
-public class MongoTicketListener extends AbstractOnInsertOrUpdateMongoEventListener<Ticket> {
+public class MongoTicketListener extends AbstractOnInsertOrUpdateMongoEventListener<Ticket> implements MongoTicketingListener<Ticket> {
     private final TicketCreatedPublisher ticketCreatedPublisher;
     private final TicketUpdatedPublisher ticketUpdatedPublisher;
 

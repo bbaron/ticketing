@@ -9,7 +9,8 @@ import org.springframework.data.mongodb.core.mapping.event.MongoMappingEvent;
 
 import static ticketing.common.mongodb.InsertOrUpdateDecider.Decision;
 
-public abstract class AbstractOnInsertOrUpdateMongoEventListener<E> extends AbstractMongoEventListener<E> {
+public abstract class AbstractOnInsertOrUpdateMongoEventListener<E>
+        extends AbstractMongoEventListener<E> implements MongoTicketingListener<E> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final InsertOrUpdateDecider insertOrUpdateDecider = new VersionInsertOrUpdateDecider();
 
@@ -34,24 +35,28 @@ public abstract class AbstractOnInsertOrUpdateMongoEventListener<E> extends Abst
         else onAfterUpdate(new AfterUpdateEvent<>(event));
     }
 
+    @Override
     public void onBeforeInsert(BeforeInsertEvent<E> beforeInsertEvent) {
         if (logger.isDebugEnabled()) {
             logger.debug("onBeforeInsert: {}", beforeInsertEvent);
         }
     }
 
+    @Override
     public void onAfterInsert(AfterInsertEvent<E> afterInsertEvent) {
         if (logger.isDebugEnabled()) {
             logger.debug("onAfterInsert: {}", afterInsertEvent);
         }
     }
 
+    @Override
     public void onBeforeUpdate(BeforeUpdateEvent<E> beforeUpdateEvent) {
         if (logger.isDebugEnabled()) {
             logger.debug("onBeforeUpdate: {}", beforeUpdateEvent);
         }
     }
 
+    @Override
     public void onAfterUpdate(AfterUpdateEvent<E> afterUpdateEvent) {
         if (logger.isDebugEnabled()) {
             logger.debug("onAfterUpdate: {}", afterUpdateEvent);
