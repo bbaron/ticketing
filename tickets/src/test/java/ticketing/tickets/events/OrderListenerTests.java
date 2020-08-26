@@ -1,56 +1,58 @@
 package ticketing.tickets.events;
 
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
-import ticketing.tickets.events.listeners.OrderCreatedEvent;
+import ticketing.tickets.TicketRequest;
+import ticketing.tickets.events.listeners.OrderCancelledListener;
 import ticketing.tickets.events.listeners.OrderCreatedListener;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import ticketing.common.json.JsonOperations;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-
+@SpringBootTest
 public class OrderListenerTests {
-    private OrderCreatedListener orderCreatedListener;
-    @Mock
-    private TicketRepository ticketRepository;
-    @Mock
-    private JsonOperations jsonOperations;
-    private final String ticketId = ObjectId.get().toHexString();
+    @Autowired
+    OrderCreatedListener orderCreatedListener;
+    @Autowired
+    OrderCancelledListener orderCancelledListener;
+    @Autowired
+    TicketRepository ticketRepository;
     private final String orderId = ObjectId.get().toHexString();
-
-    @BeforeEach
-    void setUp() {
-        initMocks(this);
-        orderCreatedListener = new OrderCreatedListener(jsonOperations, ticketRepository);
-    }
+    private final String userId = ObjectId.get().toHexString();
 
     @Test
-    void sets_the_order_id_of_the_ticket() {
-        var ticket = new Ticket(ticketId, "concert", 20, "user", null);
-        when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
-
+    void created_listener_sets_the_order_id_of_the_ticket() {
+        var ticket = new Ticket(new TicketRequest("concert", 20), userId);
+        ticket = ticketRepository.save(ticket);
         var message = """
                 {"id":"%s",
                 "userId": "user",
                 "status": "Created",
                 "expiresAt": null,
                 "version": 0,
-                "ticket" : {"id: "%s", "price": %d}
+                "ticket" : {"id": "%s", "price": %d}}
                 """.formatted(orderId, ticket.id, ticket.price);
-        var event = new  OrderCreatedEvent(orderId, ticketId);
-        when(jsonOperations.readValue(message, OrderCreatedEvent.class))
-                .thenReturn(event);
         orderCreatedListener.receiveMessage(message);
-        verify(ticketRepository).save(argThat(hasProperty("orderId", equalTo(orderId))));
+        ticket = ticketRepository.findById(ticket.id).orElseThrow();
+        assertEquals(orderId, ticket.orderId);
+    }
+
+    @Test
+    void cancelled_listener_nulls_the_order_id_of_the_ticket() {
+        var ticket = new Ticket(new TicketRequest("concert", 20), userId);
+        ticket.setOrderId(orderId);
+        ticket = ticketRepository.save(ticket);
+        var message = """
+                {"id":"%s",
+                "ticket" : {"id": "%s"}}
+                """.formatted(orderId, ticket.id);
+        ticket = ticketRepository.findById(ticket.id).orElseThrow();
+        assertNotNull(ticket.orderId);
+        orderCancelledListener.receiveMessage(message);
+        ticket = ticketRepository.findById(ticket.id).orElseThrow();
+        assertNull(ticket.orderId);
     }
 }

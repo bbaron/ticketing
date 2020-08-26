@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ticketing.common.autoconfigure.TicketingProperties;
+import ticketing.tickets.events.listeners.OrderCancelledListener;
 import ticketing.tickets.events.listeners.OrderCreatedListener;
 
 
@@ -64,20 +65,20 @@ public class MessagingConfiguration {
         return new MessageListenerAdapter(listener, "receiveMessage");
     }
 
-//    @Bean
-//    SimpleMessageListenerContainer orderCancelledContainer(ConnectionFactory connectionFactory,
-//                                                           OrderCancelledListener listener) {
-//        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-//        container.setConnectionFactory(connectionFactory);
-//        container.setQueueNames(ORDER_CANCELLED_QUEUE);
-//        container.setMessageListener(orderCancelledAdapter(listener));
-//        return container;
-//    }
-//
-//    @Bean
-//    MessageListenerAdapter orderCancelledAdapter(OrderCancelledListener listener) {
-//        return new MessageListenerAdapter(listener, "receiveMessage");
-//    }
+    @Bean
+    SimpleMessageListenerContainer orderCancelledContainer(ConnectionFactory connectionFactory,
+                                                           OrderCancelledListener listener) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(ORDER_CANCELLED_QUEUE);
+        container.setMessageListener(orderCancelledAdapter(listener));
+        return container;
+    }
+
+    @Bean
+    MessageListenerAdapter orderCancelledAdapter(OrderCancelledListener listener) {
+        return new MessageListenerAdapter(listener, "receiveMessage");
+    }
 
 
 }

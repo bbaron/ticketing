@@ -59,6 +59,10 @@ public class Ticket {
         return new Ticket(id, title, price, userId, version, orderId);
     }
 
+    public Ticket withoutOrderId() {
+        return new Ticket(id, title, price, userId, version);
+    }
+
     public Ticket update(String title, Integer price) {
         return new Ticket(id, title, price, userId, version, orderId);
     }
@@ -115,4 +119,5 @@ public class Ticket {
     public String toString() {
         return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d, orderId=%s}".formatted(id, title, price, userId, version, orderId);
     }
+
 }
