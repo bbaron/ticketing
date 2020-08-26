@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
 import ticketing.common.exceptions.NotFoundException;
 import ticketing.common.exceptions.RequestValidationException;
@@ -57,6 +58,9 @@ public class TicketController {
             throw new RequestValidationException(result);
         }
         var ticket = ticketRepository.findById(id).orElseThrow(NotFoundException::new);
+        if (ticket.reserved()) {
+            throw new BadRequestException("Cannot edit a reserved ticket");
+        }
         if (!Objects.equals(ticket.getUserId(), principal.getName())) {
             throw new ForbiddenException();
         }

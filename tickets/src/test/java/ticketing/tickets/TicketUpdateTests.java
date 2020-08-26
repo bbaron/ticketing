@@ -1,6 +1,7 @@
 package ticketing.tickets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.events.Messenger;
-import ticketing.tickets.Ticket;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -30,6 +30,8 @@ class TicketUpdateTests {
     MockMvc mvc;
     @MockBean
     Messenger messenger;
+    @Autowired
+    TicketRepository ticketRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -168,4 +170,33 @@ class TicketUpdateTests {
                         """.formatted(title).strip()));
     }
 
+    @Test
+    @DisplayName("rejects updates if ticket is reserved")
+    @WithMockUser
+    void test7() throws Exception {
+        String request = """
+                {"title": "asdf", "price": 20}
+                """;
+        var response = mvc.perform(post("/api/tickets")
+                .contentType(APPLICATION_JSON)
+                .content(request))
+                .andDo(print())
+                .andExpect(status().is(201))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        var ticketId = objectMapper.readValue(response, Ticket.class).id;
+        var ticket = ticketRepository.findById(ticketId).orElseThrow();
+        ticket.setOrderId(ObjectId.get().toHexString());
+        ticketRepository.save(ticket);
+        request = """
+                {"title": "qwerty", "price": 200}
+                """;
+        mvc.perform(put("/api/tickets/{id}", ticketId)
+                .contentType(APPLICATION_JSON)
+                .content(request))
+                .andDo(print())
+                .andExpect(status().is(400));
+
+    }
 }

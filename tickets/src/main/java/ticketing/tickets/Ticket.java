@@ -120,4 +120,7 @@ public class Ticket {
         return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d, orderId=%s}".formatted(id, title, price, userId, version, orderId);
     }
 
+    public boolean reserved() {
+        return orderId != null;
+    }
 }
