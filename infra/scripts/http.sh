@@ -8,28 +8,18 @@ port='8080'
 HTTP='http --body --check-status --ignore-stdin --timeout=2.5'
 JQ='jq -r'
 
-#if $HTTP --check-status --ignore-stdin ":$port/api/users/currentuser"; then
-#  echo 'OK!'
-#  exit 0
-#else
-#  rc=$?
-#  case $rc in
-#    2) echo 'Request timed out';;
-#    3) echo 'Unexpected 3xx redirect';;
-#    4) echo '4xx client error';;
-#    5) echo '5xx server error';;
-#    6) echo 'Exceeded max redirects';;
-#    *) echo 'Other error';;
-#  esac
-#  exit $rc
-#fi
-
 # signin
+auth_url='/api/users/signin'
 auth_header=''
-jwt=$($HTTP POST ":$port/api/users/signin" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
+jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
 if [[ "$jwt" == 'null' ]]; then
-  echo 'jwt is null'
-  exit 1
+  echo "POST $auth_url failed, trying signup"
+  auth_url='/api/users/signup'
+  jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
+  if [[ "$jwt" == 'null' ]]; then
+    echo "POST $auth_url failed"
+    exit 1
+  fi
 fi
 auth_header="x-auth-info:$jwt"
 echo "signed in jwt = $jwt"
@@ -45,8 +35,7 @@ echo "created ticket_id = $ticket_id"
 $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"
 
 # update ticket
-if $HTTP PUT ":$port/api/tickets/$ticket_id" "$content_type" "$auth_header" "title=ballgame ($session)" 'price=15'
-then
+if $HTTP PUT ":$port/api/tickets/$ticket_id" "$content_type" "$auth_header" "title=ballgame ($session)" 'price=15'; then
   echo "updated ticket_id = $ticket_id"
   $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"
 else
@@ -62,35 +51,30 @@ if [[ "$order_id" == 'null' ]]; then
 fi
 echo "created order_id = $order_id"
 echo "order $order_id"
-if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"
-then
+if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
   echo "get $order_id failed"
   exit 1
 fi
 echo "ticket $ticket_id"
-if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"
-then
+if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
   echo "get $ticket_id failed"
   exit 1
 fi
 
 # cancel order
-if $HTTP DELETE ":$port/api/orders/$order_id" "$auth_header"
-then
+if $HTTP DELETE ":$port/api/orders/$order_id" "$auth_header"; then
   echo "cancelled order_id = $order_id"
 else
   echo "cancel order $order_id failed"
   exit 1
 fi
 echo "order $order_id"
-if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"
-then
+if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
   echo "get $order_id failed"
   exit 1
 fi
 echo "ticket $ticket_id"
-if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"
-then
+if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
   echo "get $ticket_id failed"
   exit 1
 fi
