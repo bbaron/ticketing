@@ -29,7 +29,7 @@ public record User(
         this(null, email, password);
     }
 
-    public UserResponse toUserResponse() {
-        return new UserResponse(id, email);
+    public UserResponse toUserResponse(String jwt) {
+        return new UserResponse(id, email, jwt);
     }
 }

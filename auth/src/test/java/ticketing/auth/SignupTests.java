@@ -107,11 +107,12 @@ class SignupTests {
                 .content(content))
                 .andExpect(jsonPath("$.email").value(email))
                 .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.jwt").exists())
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andDo(print())
                 .andReturn()
                 .getResponse();
-        var jwt = response.getHeader(props.getSecurity().getAuthHeaderName());
+        var jwt = response.getHeader(props.security.authHeaderName);
         assertNotNull(jwt);
         assertNotNull(jwtUtils);
 

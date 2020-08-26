@@ -6,5 +6,7 @@ public record UserResponse(
         @JsonProperty("id")
         String id,
         @JsonProperty("email")
-        String email) {
+        String email,
+        @JsonProperty("jwt")
+        String jwt) {
 }

@@ -41,9 +41,6 @@ public class AuthController {
     @PostMapping(path = "/signup")
     @ResponseStatus(CREATED)
     public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpServletResponse response) {
-        if ("blow@up.com".equals(userRequest.email())) {
-            throw new IllegalStateException("What happens on this exception?");
-        }
         if (!bindingResult.hasFieldErrors("email")) {
             if (userRepository.existsByEmail(userRequest.email())) {
                 bindingResult.rejectValue("email", "duplicate-email", "Email in use");
@@ -54,8 +51,7 @@ public class AuthController {
         }
         var user = userRequest.toUser(passwordEncoder);
         user = userRepository.insert(user);
-        sendAuthInfo(response, generateJwt(user));
-        return user.toUserResponse();
+        return userResponse(user, response);
     }
 
     @PostMapping(path = "/signin")
@@ -73,8 +69,7 @@ public class AuthController {
         if (!passwordEncoder.matches(userRequest.password(), user.password())) {
             throw new BadCredentialsException();
         }
-        sendAuthInfo(response, generateJwt(user));
-        return user.toUserResponse();
+        return userResponse(user, response);
     }
 
     @GetMapping(path = "/currentuser")
@@ -88,18 +83,14 @@ public class AuthController {
     @RequestMapping(path = "/signout")
     @ResponseStatus(OK)
     public void signout(HttpServletResponse response) {
-        logger.info("Signing out current user");
-        sendAuthInfo(response, "SIGNED_OUT");
+        logger.info("Signing out current user, response: " + response);
+//        response.addHeader(ticketingProperties.security.authHeaderName, "SIGNED_OUT");
     }
 
-
-    private String generateJwt(User user) {
-        return jwtUtils.generateJwt(user.id(), user.email());
+    private UserResponse userResponse(User user, HttpServletResponse response) {
+        String jwt = jwtUtils.generateJwt(user.id(), user.email());
+        response.addHeader(ticketingProperties.security.authHeaderName, jwt);
+        return user.toUserResponse(jwt);
     }
-
-    private void sendAuthInfo(HttpServletResponse response, String value) {
-        response.addHeader(ticketingProperties.getSecurity().getAuthHeaderName(), value);
-    }
-
 
 }
