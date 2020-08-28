@@ -5,10 +5,22 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 @ConfigurationProperties(prefix = "ticketing")
 public class TicketingProperties {
     public Security security = new Security();
     public Events events = new Events();
+    public Orders orders = new Orders();
+
+    public Orders getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Orders orders) {
+        this.orders = orders;
+    }
 
     public Security getSecurity() {
         return security;
@@ -24,6 +36,11 @@ public class TicketingProperties {
 
     public void setEvents(Events events) {
         this.events = events;
+    }
+
+    @Override
+    public String toString() {
+        return "TicketingProperties{security=%s, events=%s, orders=%s}".formatted(security, events, orders);
     }
 
     public static class Security {
@@ -87,9 +104,22 @@ public class TicketingProperties {
             return "Events{exchange='%s'}".formatted(exchange);
         }
     }
-    @Override
-    public String toString() {
-        return "TicketingProperties{security=%s}".formatted(security);
+
+    public static class Orders {
+        public long expirationWindowSeconds = SECONDS.convert(15, MINUTES);
+
+        public long getExpirationWindowSeconds() {
+            return expirationWindowSeconds;
+        }
+
+        public void setExpirationWindowSeconds(long expirationWindowSeconds) {
+            this.expirationWindowSeconds = expirationWindowSeconds;
+        }
+
+        @Override
+        public String toString() {
+            return "Orders{expirationWindowSeconds=%d}".formatted(expirationWindowSeconds);
+        }
     }
 
     @PostConstruct

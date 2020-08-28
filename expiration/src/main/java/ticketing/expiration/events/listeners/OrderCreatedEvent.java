@@ -32,7 +32,7 @@ public class OrderCreatedEvent implements Event {
     }
 
     public long calculateDelayInSeconds() {
-        long delay = now().until(expiresAt, SECONDS);
+        long delay = SECONDS.between(now(), expiresAt);
         return max(0, delay);
     }
 
@@ -40,4 +40,12 @@ public class OrderCreatedEvent implements Event {
     public String toString() {
         return "OrderCreatedEvent{id='%s', expiresAt=%s}".formatted(id, expiresAt);
     }
+
+
+    public static void main(String[] args) {
+        var a = now();
+        var b = a.plusSeconds(15);
+        System.out.printf("seconds between %s and %s = %s%n", a, b, max(0, SECONDS.between(a,b)));
+    }
+
 }

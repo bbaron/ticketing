@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.common.events.types.OrderStatus;
 import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
@@ -15,13 +16,9 @@ import ticketing.common.exceptions.RequestValidationException;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static java.util.concurrent.TimeUnit.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -31,14 +28,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(path = {"/api/orders", "/", ""})
 public class OrderController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-//    private static final long EXPIRATION_WINDOW_SECONDS = SECONDS.convert(15, MINUTES);
-    private static final long EXPIRATION_WINDOW_SECONDS = 15;
+    private final long expirationWindowSeconds;
     private final OrderRepository orderRepository;
     private final TicketRepository ticketRepository;
 
-    public OrderController(OrderRepository orderRepository, TicketRepository ticketRepository) {
+    public OrderController(OrderRepository orderRepository,
+                           TicketRepository ticketRepository,
+                           TicketingProperties ticketingProperties) {
         this.orderRepository = orderRepository;
         this.ticketRepository = ticketRepository;
+        this.expirationWindowSeconds = ticketingProperties.orders.expirationWindowSeconds;
     }
 
     @GetMapping
@@ -77,7 +76,7 @@ public class OrderController {
         if (reserved) {
             throw new BadRequestException("Ticket is reserved");
         }
-        var expiration = Instant.now().plusSeconds(EXPIRATION_WINDOW_SECONDS);
+        var expiration = Instant.now().plusSeconds(expirationWindowSeconds);
         logger.info("expiration: " + expiration);
         var userId = principal.getName();
         var order = new Order(userId, OrderStatus.Created, expiration, ticket);
