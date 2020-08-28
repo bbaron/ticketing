@@ -1,6 +1,7 @@
 package ticketing.orders.events;
 
 import org.springframework.stereotype.Component;
+import ticketing.common.events.types.OrderStatus;
 import ticketing.common.mongodb.AbstractOnInsertOrUpdateMongoEventListener;
 import ticketing.common.mongodb.AfterInsertEvent;
 import ticketing.common.mongodb.AfterUpdateEvent;
@@ -36,8 +37,10 @@ public class MongoOrderListener extends AbstractOnInsertOrUpdateMongoEventListen
     public void onAfterUpdate(AfterUpdateEvent<Order> afterUpdateEvent) {
         super.onAfterUpdate(afterUpdateEvent);
         var order = afterUpdateEvent.getSource();
-        var event = new OrderCancelledEvent(order.id, order.version, order.ticket.id);
-        orderCancelledPublisher.publish(event);
+        if (order.getStatus().equals(OrderStatus.Cancelled)) {
+            var event = new OrderCancelledEvent(order.id, order.version, order.ticket.id);
+            orderCancelledPublisher.publish(event);
+        }
 
     }
 }

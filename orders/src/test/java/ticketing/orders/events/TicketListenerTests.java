@@ -8,8 +8,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.lang.Nullable;
 import ticketing.orders.Ticket;
 import ticketing.orders.TicketRepository;
-import ticketing.orders.events.listeners.TicketCreatedListener;
-import ticketing.orders.events.listeners.TicketUpdatedListener;
+import ticketing.orders.events.listeners.ticketcreated.TicketCreatedListener;
+import ticketing.orders.events.listeners.ticketupdated.TicketUpdatedListener;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;

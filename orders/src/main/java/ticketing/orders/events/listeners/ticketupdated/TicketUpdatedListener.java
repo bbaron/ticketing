@@ -1,4 +1,4 @@
-package ticketing.orders.events.listeners;
+package ticketing.orders.events.listeners.ticketupdated;
 
 import org.springframework.data.domain.Example;
 import ticketing.orders.Ticket;

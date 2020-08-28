@@ -1,8 +1,7 @@
-package ticketing.orders.events.listeners;
+package ticketing.orders.events.listeners.ticketupdated;
 
 import ticketing.common.events.Event;
 
-@SuppressWarnings("unused")
 public class TicketUpdatedEvent implements Event {
     public String id, title;
     public Integer price;

@@ -1,9 +1,6 @@
 package ticketing.orders.events;
 
-import ticketing.orders.events.listeners.TicketCreatedListener;
-import ticketing.orders.events.listeners.TicketUpdatedListener;
 import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -12,6 +9,11 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ticketing.common.autoconfigure.TicketingProperties;
+import ticketing.orders.events.listeners.expirationcompleted.ExpirationCompletedListener;
+import ticketing.orders.events.listeners.ticketcreated.TicketCreatedListener;
+import ticketing.orders.events.listeners.ticketupdated.TicketUpdatedListener;
+
+import static org.springframework.amqp.core.BindingBuilder.bind;
 
 
 @Configuration
@@ -19,20 +21,11 @@ public class MessagingConfiguration {
 
     static final String TICKET_CREATED_QUEUE = "orders.ticket-created";
     static final String TICKET_UPDATED_QUEUE = "orders.ticket-updated";
+    static final String EXPIRATION_COMPLETED_QUEUE = "orders.expiration-completed";
     private final TicketingProperties properties;
 
     public MessagingConfiguration(TicketingProperties properties) {
         this.properties = properties;
-    }
-
-    @Bean
-    Queue ticketCreatedQueue() {
-        return new Queue(TICKET_CREATED_QUEUE, false);
-    }
-
-    @Bean
-    Queue ticketUpdatedQueue() {
-        return new Queue(TICKET_UPDATED_QUEUE, false);
     }
 
     @Bean
@@ -41,13 +34,33 @@ public class MessagingConfiguration {
     }
 
     @Bean
+    Queue ticketCreatedQueue() {
+        return new Queue(TICKET_CREATED_QUEUE, true);
+    }
+
+    @Bean
+    Queue ticketUpdatedQueue() {
+        return new Queue(TICKET_UPDATED_QUEUE, true);
+    }
+
+    @Bean
+    Queue expirationCompletedQueue() {
+        return new Queue(EXPIRATION_COMPLETED_QUEUE, true);
+    }
+
+    @Bean
     Binding ticketCreatedBinding(TopicExchange exchange) {
-        return BindingBuilder.bind(ticketCreatedQueue()).to(exchange).with("ticket.created.#");
+        return bind(ticketCreatedQueue()).to(exchange).with("ticket.created.#");
     }
 
     @Bean
     Binding ticketUpdatedBinding(TopicExchange exchange) {
-        return BindingBuilder.bind(ticketUpdatedQueue()).to(exchange).with("ticket.updated.#");
+        return bind(ticketUpdatedQueue()).to(exchange).with("ticket.updated.#");
+    }
+
+    @Bean
+    Binding expirationCompletedBinding(TopicExchange exchange) {
+        return bind(expirationCompletedQueue()).to(exchange).with("expiration.completed.#");
     }
 
     @Bean
@@ -78,5 +91,18 @@ public class MessagingConfiguration {
         return new MessageListenerAdapter(listener, "receiveMessage");
     }
 
+    @Bean
+    SimpleMessageListenerContainer expirationCompletedContainer(ConnectionFactory connectionFactory, ExpirationCompletedListener listener) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(EXPIRATION_COMPLETED_QUEUE);
+        container.setMessageListener(expirationCompletedAdapter(listener));
+        return container;
+    }
+
+    @Bean
+    MessageListenerAdapter expirationCompletedAdapter(ExpirationCompletedListener listener) {
+        return new MessageListenerAdapter(listener, "receiveMessage");
+    }
 
 }

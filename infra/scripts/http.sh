@@ -62,12 +62,26 @@ if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
 fi
 
 # cancel order
-if $HTTP DELETE ":$port/api/orders/$order_id" "$auth_header"; then
-  echo "cancelled order_id = $order_id"
-else
-  echo "cancel order $order_id failed"
-  exit 1
-fi
+#if $HTTP DELETE ":$port/api/orders/$order_id" "$auth_header"; then
+#  echo "cancelled order_id = $order_id"
+#else
+#  echo "cancel order $order_id failed"
+#  exit 1
+#fi
+#echo "order $order_id"
+#if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
+#  echo "get $order_id failed"
+#  exit 1
+#fi
+#echo "ticket $ticket_id"
+#if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
+#  echo "get $ticket_id failed"
+#  exit 1
+#fi
+
+echo "waiting for order to expire"
+sleep 20
+
 echo "order $order_id"
 if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
   echo "get $order_id failed"
@@ -78,3 +92,4 @@ if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
   echo "get $ticket_id failed"
   exit 1
 fi
+

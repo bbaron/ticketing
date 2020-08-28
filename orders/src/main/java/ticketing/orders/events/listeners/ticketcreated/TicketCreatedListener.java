@@ -1,4 +1,4 @@
-package ticketing.orders.events.listeners;
+package ticketing.orders.events.listeners.ticketcreated;
 
 import ticketing.orders.Ticket;
 import ticketing.orders.TicketRepository;
