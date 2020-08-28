@@ -2,18 +2,17 @@ package ticketing.orders;
 
 import ticketing.common.events.types.OrderStatus;
 
-import java.util.Date;
+import java.time.Instant;
 
-@SuppressWarnings("unused")
 public class OrderResponse {
     private final String id;
     private final Long version;
     private final OrderStatus status;
     private final String userId;
-    private final Date expiresAt;
+    private final Instant expiresAt;
     private final TicketResponse ticket;
 
-    public OrderResponse(String id, Long version, OrderStatus status, String userId, Date expiresAt, TicketResponse ticket) {
+    public OrderResponse(String id, Long version, OrderStatus status, String userId, Instant expiresAt, TicketResponse ticket) {
         this.id = id;
         this.version = version;
         this.status = status;
@@ -47,7 +46,7 @@ public class OrderResponse {
         return userId;
     }
 
-    public Date getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 

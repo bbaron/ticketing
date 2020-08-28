@@ -6,7 +6,7 @@ import ticketing.common.json.JsonOperations;
 
 public abstract class BaseListener<E> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private final JsonOperations jsonOperations;
+    protected final JsonOperations jsonOperations;
     private final Class<E> eventClass;
 
     protected BaseListener(JsonOperations jsonOperations, Class<E> eventClass) {

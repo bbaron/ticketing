@@ -3,13 +3,12 @@ package ticketing.orders.events.publishers;
 import ticketing.common.events.Event;
 import ticketing.common.events.types.OrderStatus;
 
-import java.util.Date;
+import java.time.Instant;
 
-@SuppressWarnings("unused")
 public class OrderCreatedEvent implements Event {
     public String id, userId;
     public OrderStatus status;
-    public Date expiresAt;
+    public Instant expiresAt;
     public Long version;
     public Ticket ticket = new Ticket();
 
@@ -17,7 +16,7 @@ public class OrderCreatedEvent implements Event {
     }
 
     public OrderCreatedEvent(String id, String userId,
-                             Date expiresAt, Long version, OrderStatus status,
+                             Instant expiresAt, Long version, OrderStatus status,
                              String ticketId, Integer ticketPrice) {
         this.id = id;
         this.userId = userId;
@@ -51,11 +50,11 @@ public class OrderCreatedEvent implements Event {
         this.status = status;
     }
 
-    public Date getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(Date expiresAt) {
+    public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
 

@@ -10,12 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.events.Messenger;
 import ticketing.common.events.types.OrderStatus;
 import ticketing.common.test.MockMvcSetup;
-import ticketing.orders.Order;
-import ticketing.orders.OrderRepository;
-import ticketing.orders.Ticket;
-import ticketing.orders.TicketRepository;
 
-import java.util.Date;
+import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -72,7 +68,7 @@ class OrderCreateTests {
         var ticket = new Ticket(null, "concert", 20);
         ticket = ticketRepository.save(ticket);
         var ticketId = ticket.getId();
-        var order = new Order("user", OrderStatus.Created, new Date(), ticket);
+        var order = new Order("user", OrderStatus.Created, Instant.now(), ticket);
         orderRepository.save(order);
 
         var content = """

@@ -6,16 +6,15 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ticketing.common.events.types.OrderStatus;
 
-import java.util.Date;
+import java.time.Instant;
 
-@SuppressWarnings("unused")
 @Document
 public class Order {
     @Id
     public String id;
     public String userId;
     public OrderStatus status;
-    public Date expiration;
+    public Instant expiration;
     @Version
     public Long version;
     @DBRef
@@ -24,7 +23,7 @@ public class Order {
     public Order() {
     }
 
-    public Order(String userId, OrderStatus status, Date expiration, Ticket ticket) {
+    public Order(String userId, OrderStatus status, Instant expiration, Ticket ticket) {
         this.userId = userId;
         this.status = status;
         this.expiration = expiration;
@@ -47,11 +46,11 @@ public class Order {
         this.status = status;
     }
 
-    public Date getExpiration() {
+    public Instant getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(Date expiration) {
+    public void setExpiration(Instant expiration) {
         this.expiration = expiration;
     }
 
