@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import ticketing.common.json.JacksonJsonOperations;
 import ticketing.common.json.JsonOperations;
 import ticketing.orders.Order;
@@ -35,7 +36,6 @@ public class ExpirationCompletedListenerTests {
 
     @BeforeEach
     void setUp() {
-        order.setStatus(Created);
         order.setId(orderId);
         ticket.setOrderId(orderId);
         ticket.setTitle("concert");
@@ -47,8 +47,18 @@ public class ExpirationCompletedListenerTests {
     @Test
     @DisplayName("updates the order status to cancelled")
     void test1() {
+        order.setStatus(Created);
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
         listener.receiveMessage(message);
         verify(orderRepository).save(argThat(hasProperty("status", equalTo(Cancelled))));
+    }
+
+    @Test
+    @DisplayName("does not cancel a completed order")
+    void test() {
+        order.setStatus(Complete);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        listener.receiveMessage(message);
+        verify(orderRepository, never()).save(any());
     }
 }
