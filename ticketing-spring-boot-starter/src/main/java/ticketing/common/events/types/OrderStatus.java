@@ -23,4 +23,8 @@ public enum OrderStatus {
         return EnumSet.of(Created, Complete, AwaitingPayment).contains(this);
     }
 
+    public boolean isCancelled() {
+        return this == Cancelled;
+    }
+
 }
