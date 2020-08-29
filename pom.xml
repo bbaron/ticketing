@@ -17,6 +17,7 @@
         <module>gateway</module>
         <module>auth</module>
         <module>expiration</module>
+        <module>payments</module>
     </modules>
 
 </project>
