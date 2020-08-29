@@ -24,6 +24,9 @@ zuul:
     orders:
       path: /api/orders/**
       service-id: orders
+    payments:
+      path: /api/payments/**
+      service-id: payments
     client:
       path: /**
       url: http://localhost:3000
