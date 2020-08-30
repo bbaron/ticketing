@@ -18,6 +18,7 @@
         <module>auth</module>
         <module>expiration</module>
         <module>payments</module>
+        <module>testing</module>
     </modules>
 
 </project>
