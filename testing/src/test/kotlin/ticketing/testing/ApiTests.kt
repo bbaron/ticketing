@@ -235,8 +235,8 @@ class ApiTests {
         @Order(13)
         @DisplayName("order and wait for it to expire")
         internal fun `order and wait for it to expire`() {
-            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
-            sleep(20000)
+            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
+            sleep(2000)
             val order = api.getOrder(orderId, ticketBuyer.jwt)
                     .execute()
                     .body()!!
@@ -265,8 +265,12 @@ class ApiTests {
         return response.body() ?: fail("POST ticket failed")
     }
 
-    private fun createOrder(ticket: TicketResponse, user: UserResponse): OrderResponse {
-        val response = api.postOrder(OrderRequest(ticket.id), user.jwt).execute()
+    private fun createOrder(ticket: TicketResponse, user: UserResponse, expiration: String? = null): OrderResponse {
+        val request = OrderRequest(ticket.id)
+        val response = if (expiration == null)
+            api.postOrder(request, user.jwt).execute()
+        else
+            api.postOrder(request, user.jwt, expiration).execute()
         assertThat(response.code()).isEqualTo(201)
         return response.body() ?: fail("POST order failed")
     }

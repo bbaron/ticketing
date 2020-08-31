@@ -30,6 +30,7 @@ data class OrderResponse(
             val price: Int
     )
 }
+
 data class OrdersResponse(val orders: List<OrderResponse>)
 
 interface Api {
@@ -63,7 +64,12 @@ interface Api {
 
     @POST("/api/orders")
     fun postOrder(@Body orderRequest: OrderRequest,
-                   @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+                  @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+
+    @POST("/api/orders")
+    fun postOrder(@Body orderRequest: OrderRequest,
+                  @Header("x-auth-info") authInfo: String,
+                  @Query("expiration") expiration: String): Call<OrderResponse>
 
     @GET("/api/orders")
     fun getOrders(@Header("x-auth-info") authInfo: String): Call<OrdersResponse>
@@ -74,7 +80,7 @@ interface Api {
 
     @DELETE("/api/orders/{id}")
     fun cancelOrder(@Path("id") id: String,
-                 @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+                    @Header("x-auth-info") authInfo: String): Call<OrderResponse>
 
     companion object {
         private const val DEFAULT_BASE_URL = "http://localhost:8080"

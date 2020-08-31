@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -62,10 +63,11 @@ public class OrderController {
         return new OrderResponse(order);
     }
 
-    @PostMapping()
+    @PostMapping
     ResponseEntity<OrderResponse> create(@RequestBody @Valid OrderRequest orderRequest,
                                          BindingResult bindingResult,
-                                         Principal principal) {
+                                         Principal principal,
+                                         @RequestParam(value = "expiration", required = false) Long expirationSeconds) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
@@ -76,7 +78,11 @@ public class OrderController {
         if (reserved) {
             throw new BadRequestException("Ticket is reserved");
         }
-        var expiration = Instant.now().plusSeconds(expirationWindowSeconds);
+        if (expirationSeconds != null) {
+            logger.info("Custom expiration of {} seconds", expirationSeconds);
+        }
+        long seconds = requireNonNullElse(expirationSeconds, expirationWindowSeconds);
+        var expiration = Instant.now().plusSeconds(seconds);
         logger.info("expiration: " + expiration);
         var userId = principal.getName();
         var order = new Order(userId, OrderStatus.Created, expiration, ticket);
