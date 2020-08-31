@@ -72,7 +72,7 @@ class TicketUpdateTests {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        Ticket ticket = objectMapper.readValue(response, Ticket.class);
+        var ticket = objectMapper.readValue(response, TicketResponse.class);
 
         mvc.perform(put("/api/tickets/{id}", ticket.getId())
                 .with(user("user2"))
@@ -98,7 +98,7 @@ class TicketUpdateTests {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        Ticket ticket = objectMapper.readValue(response, Ticket.class);
+        var ticket = objectMapper.readValue(response, TicketResponse.class);
 
         request = """
                 {"price": 10}
@@ -126,7 +126,7 @@ class TicketUpdateTests {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        Ticket ticket = objectMapper.readValue(response, Ticket.class);
+        var ticket = objectMapper.readValue(response, TicketResponse.class);
 
         request = """
                 {"price": -10, "title": "asdf"}
@@ -153,7 +153,7 @@ class TicketUpdateTests {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        Ticket ticket = objectMapper.readValue(response, Ticket.class);
+        var ticket = objectMapper.readValue(response, TicketResponse.class);
         reset(messenger);
         var title = "qwerty";
         request = """
@@ -185,7 +185,7 @@ class TicketUpdateTests {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        var ticketId = objectMapper.readValue(response, Ticket.class).id;
+        var ticketId = objectMapper.readValue(response, TicketResponse.class).getId();
         var ticket = ticketRepository.findById(ticketId).orElseThrow();
         ticket.setOrderId(ObjectId.get().toHexString());
         ticketRepository.save(ticket);

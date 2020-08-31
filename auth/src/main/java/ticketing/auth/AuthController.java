@@ -51,7 +51,9 @@ public class AuthController {
         }
         var user = userRequest.toUser(passwordEncoder);
         user = userRepository.insert(user);
-        return userResponse(user, response);
+        var userResponse =  userResponse(user, response);
+        logger.info("signed up " + userResponse);
+        return userResponse;
     }
 
     @PostMapping(path = "/signin")
@@ -69,7 +71,9 @@ public class AuthController {
         if (!passwordEncoder.matches(userRequest.password(), user.password())) {
             throw new BadCredentialsException();
         }
-        return userResponse(user, response);
+        var userResponse =  userResponse(user, response);
+        logger.info("signed in " + userResponse);
+        return userResponse;
     }
 
     @GetMapping(path = "/currentuser")

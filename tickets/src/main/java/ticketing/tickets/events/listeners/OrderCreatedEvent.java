@@ -14,6 +14,27 @@ public class OrderCreatedEvent implements Event {
         this.ticket = new Ticket(ticketId);
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Ticket getTicket() {
+        return ticket;
+    }
+
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderCreatedEvent{id='%s', ticket=%s}".formatted(id, ticket);
+    }
+
     public static class Ticket {
         public String id;
 
