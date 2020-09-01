@@ -13,6 +13,7 @@ public class TicketingProperties {
     public Security security = new Security();
     public Events events = new Events();
     public Orders orders = new Orders();
+    public Payments payments = new Payments();
 
     public Orders getOrders() {
         return orders;
@@ -38,9 +39,17 @@ public class TicketingProperties {
         this.events = events;
     }
 
+    public Payments getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Payments payments) {
+        this.payments = payments;
+    }
+
     @Override
     public String toString() {
-        return "TicketingProperties{security=%s, events=%s, orders=%s}".formatted(security, events, orders);
+        return "TicketingProperties{security=%s, events=%s, orders=%s, payments=%s}".formatted(security, events, orders, payments);
     }
 
     public static class Security {
@@ -122,8 +131,27 @@ public class TicketingProperties {
         }
     }
 
+    public static class Payments {
+        public String stripeKey;
+
+        public String getStripeKey() {
+            return stripeKey;
+        }
+
+        public void setStripeKey(String stripeKey) {
+            this.stripeKey = stripeKey;
+        }
+
+        @Override
+        public String toString() {
+            return "Payments{stripeKey='%s'}".formatted(stripeKey);
+        }
+    }
+
     @PostConstruct
     public void postConstruct() {
-        Assert.hasLength(security.jwtKey, "jwt-key is a required property");
+        Assert.hasLength(security.jwtKey, "ticketing.security.jwt-key is a required property");
+        Assert.hasLength(payments.stripeKey, "ticketing.payments.stripe-key is a required property");
+
     }
 }

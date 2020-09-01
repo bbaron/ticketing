@@ -32,6 +32,12 @@ data class OrderResponse(
 }
 
 data class OrdersResponse(val orders: List<OrderResponse>)
+data class PaymentRequest(
+        val token: String,
+        val orderId: String
+)
+
+data class PaymentResponse(val id: String)
 
 interface Api {
 
@@ -81,6 +87,10 @@ interface Api {
     @DELETE("/api/orders/{id}")
     fun cancelOrder(@Path("id") id: String,
                     @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+
+    @POST("/api/payments")
+    fun postPayment(@Body paymentRequest: PaymentRequest,
+                    @Header("x-auth-info") authInfo: String): Call<PaymentResponse>
 
     companion object {
         private const val DEFAULT_BASE_URL = "http://localhost:8080"

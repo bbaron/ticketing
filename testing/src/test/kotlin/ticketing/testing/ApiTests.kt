@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
-import java.lang.Thread.*
+import java.lang.Thread.sleep
 
 @TestMethodOrder(OrderAnnotation::class)
 class ApiTests {
@@ -16,9 +16,13 @@ class ApiTests {
 
     @BeforeAll
     internal fun setUp() {
-        val response = api.ping().execute()
-        assumeThat(response.isSuccessful).isTrue()
-        assumeThat(response.body()).isEqualTo("pong")
+        try {
+            val response = api.ping().execute()
+            assumeThat(response.isSuccessful).isTrue()
+            assumeThat(response.body()).isEqualTo("pong")
+        } catch (e: Throwable) {
+            assumeThat(false).isTrue()
+        }
     }
 
     @Test
@@ -236,11 +240,28 @@ class ApiTests {
         @DisplayName("order and wait for it to expire")
         internal fun `order and wait for it to expire`() {
             val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
+            println("waiting for order $orderId to expire")
             sleep(2000)
             val order = api.getOrder(orderId, ticketBuyer.jwt)
                     .execute()
                     .body()!!
             assertThat(order.status).isEqualTo("Cancelled")
+        }
+
+        @Test
+        @Order(14)
+        @DisplayName("make payment on order")
+        internal fun `make payment on order`() {
+            val paymentApi = Api.create("http://localhost:8085")
+            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
+            println("make payment for order $orderId")
+            val paymentRequest = PaymentRequest("tok_visa", orderId)
+            val response = paymentApi.postPayment(paymentRequest, ticketBuyer.jwt).execute()
+            assertThat(response.code()).isEqualTo(201)
+            val order = api.getOrder(orderId, ticketBuyer.jwt)
+                    .execute()
+                    .body()!!
+            assertThat(order.status).isEqualTo("Complete")
         }
     }
 

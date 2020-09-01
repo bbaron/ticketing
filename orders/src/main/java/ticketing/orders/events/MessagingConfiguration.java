@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.orders.events.listeners.expirationcompleted.ExpirationCompletedListener;
+import ticketing.orders.events.listeners.paymentcreated.PaymentCreatedListener;
 import ticketing.orders.events.listeners.ticketcreated.TicketCreatedListener;
 import ticketing.orders.events.listeners.ticketupdated.TicketUpdatedListener;
 
@@ -22,6 +23,7 @@ public class MessagingConfiguration {
     static final String TICKET_CREATED_QUEUE = "orders.ticket-created";
     static final String TICKET_UPDATED_QUEUE = "orders.ticket-updated";
     static final String EXPIRATION_COMPLETED_QUEUE = "orders.expiration-completed";
+    static final String PAYMENT_CREATED_QUEUE = "orders.payment-created";
     private final TicketingProperties properties;
 
     public MessagingConfiguration(TicketingProperties properties) {
@@ -49,6 +51,11 @@ public class MessagingConfiguration {
     }
 
     @Bean
+    Queue paymentCreatedQueue() {
+        return new Queue(PAYMENT_CREATED_QUEUE, true);
+    }
+
+    @Bean
     Binding ticketCreatedBinding(TopicExchange exchange) {
         return bind(ticketCreatedQueue()).to(exchange).with("ticket.created.#");
     }
@@ -61,6 +68,11 @@ public class MessagingConfiguration {
     @Bean
     Binding expirationCompletedBinding(TopicExchange exchange) {
         return bind(expirationCompletedQueue()).to(exchange).with("expiration.completed.#");
+    }
+
+    @Bean
+    Binding paymentCreatedBinding(TopicExchange exchange) {
+        return bind(paymentCreatedQueue()).to(exchange).with("payment.created.#");
     }
 
     @Bean
@@ -102,6 +114,21 @@ public class MessagingConfiguration {
 
     @Bean
     MessageListenerAdapter expirationCompletedAdapter(ExpirationCompletedListener listener) {
+        return new MessageListenerAdapter(listener, "receiveMessage");
+    }
+
+
+    @Bean
+    SimpleMessageListenerContainer paymentCreatedContainer(ConnectionFactory connectionFactory, PaymentCreatedListener listener) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(PAYMENT_CREATED_QUEUE);
+        container.setMessageListener(paymentCreatedAdapter(listener));
+        return container;
+    }
+
+    @Bean
+    MessageListenerAdapter paymentCreatedAdapter(PaymentCreatedListener listener) {
         return new MessageListenerAdapter(listener, "receiveMessage");
     }
 

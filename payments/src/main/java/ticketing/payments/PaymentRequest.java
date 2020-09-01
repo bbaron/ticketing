@@ -8,19 +8,18 @@ import javax.validation.constraints.NotNull;
 
 public record PaymentRequest(
         @NotBlank
-        @JsonProperty("title")
-        String title,
-        @Min(1)
-        @NotNull
-        @JsonProperty("price")
-        Integer price
+        @JsonProperty("token")
+        String token,
+        @NotBlank
+        @JsonProperty("orderId")
+        String orderId
 ) {
-    public String getTitle() {
-        return title;
+    public String getToken() {
+        return token;
     }
 
-    public Integer getPrice() {
-        return price;
+    public String getOrderId() {
+        return orderId;
     }
 
 }

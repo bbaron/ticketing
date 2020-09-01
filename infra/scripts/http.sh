@@ -5,7 +5,7 @@ session=$(tr -dc 'a-zA-Z0-9' </dev/urandom | fold -w 8 | head -n 1)
 email="asdf@asdf.com"
 content_type="Content-Type:application/json"
 port='8080'
-HTTP='http --body --check-status --ignore-stdin --timeout=2.5'
+HTTP='http --body --check-status --ignore-stdin'
 JQ='jq -r'
 
 # signin
@@ -79,8 +79,8 @@ fi
 #  exit 1
 #fi
 
-echo "waiting for order to expire"
-sleep 20
+#echo "waiting for order to expire"
+#sleep 20
 
 echo "order $order_id"
 if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
@@ -93,3 +93,11 @@ if ! $HTTP ":$port/api/tickets/$ticket_id" "$auth_header"; then
   exit 1
 fi
 
+echo "creating payment for order $order_id"
+http --timeout=3000 POST ":8085/api/payments" "$auth_header" "$content_type" "orderId=$order_id" "token=tok_visa"
+
+echo "order $order_id"
+if ! $HTTP ":$port/api/orders/$order_id" "$auth_header"; then
+  echo "get $order_id failed"
+  exit 1
+fi

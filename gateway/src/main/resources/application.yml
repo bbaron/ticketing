@@ -36,4 +36,8 @@ zuul:
       url: http://localhost:3000
   trace-request-body: true
   include-debug-header: true
+  host:
+    connect-timeout-millis: 30000
 
+ribbon:
+  ConnectTimeout: 30000

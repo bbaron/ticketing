@@ -8,6 +8,8 @@ public enum Subject {
     OrderCancelled("order.cancelled"),
 
     ExpirationCompleted("expiration.completed"),
+
+    PaymentCreated("payment.created"),
     ;
 
     public final String routingKey;
