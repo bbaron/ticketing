@@ -105,10 +105,11 @@ class SignupTests {
         var response = mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andExpect(jsonPath("$.email").value(email))
-                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.jwt").exists())
                 .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.currentUser.id").exists())
+                .andExpect(jsonPath("$.currentUser.email").value(email))
+                .andExpect(jsonPath("$.currentUser.iat").exists())
                 .andDo(print())
                 .andReturn()
                 .getResponse();

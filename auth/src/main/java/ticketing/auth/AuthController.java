@@ -94,7 +94,8 @@ public class AuthController {
     private UserResponse userResponse(User user, HttpServletResponse response) {
         String jwt = jwtUtils.generateJwt(user.id(), user.email());
         response.addHeader(ticketingProperties.security.authHeaderName, jwt);
-        return user.toUserResponse(jwt);
+        var currentUserResponse = jwtUtils.verifyJwt(jwt);
+        return new UserResponse(jwt, currentUserResponse.getCurrentUser());
     }
 
 }

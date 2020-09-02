@@ -6,14 +6,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.util.*
 
-data class CurrentUser(val id: String, val userId: String, val iat: Date)
+data class CurrentUser(val id: String, val email: String, val iat: Date)
 data class CurrentUserResponse(val currentUser: CurrentUser?)
 data class TicketResponse(val id: String, val title: String, val price: Int, val reserved: Boolean)
 data class TicketsResponse(val tickets: List<TicketResponse>)
 data class TicketRequest(val title: String, val price: Int)
 
 data class UserRequest(val email: String, val password: String)
-data class UserResponse(val id: String, val email: String, val jwt: String)
+data class UserResponse(val jwt: String, val currentUser: CurrentUser)
 
 data class OrderRequest(val ticketId: String)
 data class OrderResponse(

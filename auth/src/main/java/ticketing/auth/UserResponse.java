@@ -1,12 +1,10 @@
 package ticketing.auth;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
+import ticketing.common.jwt.CurrentUserResponse.CurrentUser;
 
-public record UserResponse(
-        @JsonProperty("id")
-        String id,
-        @JsonProperty("email")
-        String email,
-        @JsonProperty("jwt")
-        String jwt) {
+@Value
+public class UserResponse {
+    String jwt;
+    CurrentUser currentUser;
 }

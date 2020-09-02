@@ -61,9 +61,9 @@ class ApiTests {
         assertThat(response.code()).isEqualTo(201)
         val userResponse = response.body() ?: fail("Signup failed")
         assertAll(
-                { assertThat(userResponse.email).isEqualTo(userRequest.email) },
+                { assertThat(userResponse.currentUser.email).isEqualTo(userRequest.email) },
                 { assertThat(userResponse.jwt).isNotBlank() },
-                { assertThat(userResponse.id).isNotBlank() }
+                { assertThat(userResponse.currentUser.id).isNotBlank() }
         )
         this.userResponse = userResponse
     }
@@ -95,9 +95,9 @@ class ApiTests {
             assertThat(response.code()).isEqualTo(200)
             val userResponse = response.body() ?: fail("Signin failed")
             assertAll(
-                    { assertThat(userResponse.email).isEqualTo(userRequest.email) },
+                    { assertThat(userResponse.currentUser.email).isEqualTo(userRequest.email) },
                     { assertThat(userResponse.jwt).isNotBlank() },
-                    { assertThat(userResponse.id).isNotBlank() }
+                    { assertThat(userResponse.currentUser.id).isNotBlank() }
             )
         }
 
@@ -157,7 +157,7 @@ class ApiTests {
             val orderResponse = createOrder(ticket, ticketBuyer)
             assertAll(
                     { assertThat(orderResponse.status).isEqualTo("Created") },
-                    { assertThat(orderResponse.userId).isEqualTo(ticketBuyer.id) },
+                    { assertThat(orderResponse.userId).isEqualTo(ticketBuyer.currentUser.id) },
                     { assertThat(orderResponse.ticket.id).isEqualTo(ticket.id) },
                     { assertThat(orderResponse.id).isNotBlank() }
             )
@@ -222,7 +222,7 @@ class ApiTests {
             val response = api.getOrders(user.jwt).execute()
             assertThat(response.code()).isEqualTo(200)
             val orders = response.body()?.orders ?: fail("GET orders failed")
-            assertThat(orders).allMatch { it.userId == user.id }
+            assertThat(orders).allMatch { it.userId == user.currentUser.id }
         }
 
         @Test
