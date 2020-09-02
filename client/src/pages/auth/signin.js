@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-
 import useRequest from "../../hooks/use-request";
-import { setAuthInfo } from "../../components/auth-info";
 
-const Signin = ({ setRefreshUser }) => {
+const Signin = ({ onUserChange }) => {
   let history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,9 +14,8 @@ const Signin = ({ setRefreshUser }) => {
       password,
     },
     onSuccess: (response) => {
-      setAuthInfo(response.headers["x-auth-info"]);
       history.push("/");
-      setRefreshUser(true);
+      onUserChange(response.data);
     },
   });
 

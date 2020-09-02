@@ -7,32 +7,43 @@ import Signin from "./pages/auth/signin";
 import Header from "./components/header";
 import LandingPage from "./pages";
 import Signout from "./pages/auth/signout";
+import { removeAuthInfo, setAuthInfo } from "./components/auth-info";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [refreshUser, setRefreshUser] = useState(true);
+
   useEffect(() => {
-    if (!refreshUser) return;
     (async function () {
-      const { data } = await api().get("/api/users/currentuser");
-      setCurrentUser(data["currentUser"]);
-      setRefreshUser(false);
+      const response = await api().get("/api/users/currentuser");
+      setCurrentUser(response.data["currentUser"]);
     })();
-  }, [refreshUser]);
+  }, []);
+
+  const onUserChange = (user) => {
+    if (!user) {
+      removeAuthInfo();
+      setCurrentUser(null);
+    } else {
+      setAuthInfo(user["jwt"]);
+      setCurrentUser(user["currentUser"]);
+    }
+  };
   return (
     <div className="container" style={{ marginTop: "10px" }}>
       <BrowserRouter>
         <Header currentUser={currentUser} />
         <Switch>
-          <Route path="/" exact component={LandingPage} />
+          <Route path="/" exact>
+            <LandingPage currentUser={currentUser} />
+          </Route>
           <Route path="/auth/signin">
-            <Signin setRefreshUser={setRefreshUser} />
+            <Signin onUserChange={onUserChange} />
           </Route>
           <Route path="/auth/signup">
-            <Signup setRefreshUser={setRefreshUser} />
+            <Signup onUserChange={onUserChange} />
           </Route>
           <Route path="/auth/signout">
-            <Signout setRefreshUser={setRefreshUser} />
+            <Signout onUserChange={onUserChange} />
           </Route>
         </Switch>
       </BrowserRouter>
