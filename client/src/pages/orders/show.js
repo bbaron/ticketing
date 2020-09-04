@@ -1,0 +1,64 @@
+import React, { useEffect, useState } from "react";
+import StripeCheckout from "react-stripe-checkout";
+import { useParams } from "react-router-dom";
+import api from "../../api/build-client";
+import useRequest from "../../hooks/use-request";
+
+const OrderShow = ({ currentUser }) => {
+  const stripeKey =
+    "pk_test_51HMK5JC0jjNENKUNYdWJ3S8La9OmNPlmhl4dML0hdlWS7hNcA43I15evgVosEpaiOFgVyAL0nHvWMPJ48bmnnBh600iXqKONgL";
+  const [order, setOrder] = useState({});
+  const [timeLeft, setTimeLeft] = useState(0);
+  const { orderId } = useParams();
+  useEffect(() => {
+    (async function () {
+      const { data } = await api().get(`/api/orders/${orderId}`);
+      setOrder(data);
+    })();
+  }, [orderId]);
+  useEffect(() => {
+    if (!order) return;
+    const findTimeLeft = () => {
+      const msLeft = new Date(order.expiresAt) - new Date();
+      setTimeLeft(Math.round(msLeft / 1000));
+    };
+    findTimeLeft();
+    const timerId = setInterval(findTimeLeft, 1000);
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [order]);
+  const { doRequest, errors } = useRequest({
+    url: "/api/payments",
+    method: "post",
+    body: {
+      orderId: order.id,
+    },
+    onSuccess: (payment) => {
+      console.log(payment);
+    },
+  });
+  if (!order.id) {
+    return <div>Loading...</div>;
+  }
+  if (timeLeft < 0) {
+    return <div>Order expired</div>;
+  }
+
+  return (
+    <div>
+      <p>{timeLeft} seconds until orders expired</p>
+      <StripeCheckout
+        token={({ id }) => {
+          doRequest({ token: id });
+        }}
+        stripeKey={stripeKey}
+        amount={order.ticket.price * 100}
+        email={currentUser.email}
+      />
+      {errors}
+    </div>
+  );
+};
+
+export default OrderShow;

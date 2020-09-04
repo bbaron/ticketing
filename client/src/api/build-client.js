@@ -3,15 +3,15 @@ import { getAuthInfo } from "../components/auth-info";
 
 const BASE_URL = "http://localhost:8080";
 
-export default () => {
+export default (baseURL = BASE_URL) => {
   const xAuthInfo = getAuthInfo();
   if (!xAuthInfo) {
     return axios.create({
-      baseURL: BASE_URL,
+      baseURL: baseURL,
     });
   } else {
     return axios.create({
-      baseURL: BASE_URL,
+      baseURL: baseURL,
       headers: {
         "x-auth-info": xAuthInfo,
       },

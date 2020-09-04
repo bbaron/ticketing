@@ -1,13 +1,22 @@
-import axios from "axios";
 import React, { useState } from "react";
+import buildClient from "../api/build-client";
 
 export default ({ url, method, body, onSuccess }) => {
   const [errors, setErrors] = useState(null);
 
-  const doRequest = async () => {
+  const doRequest = async (props = {}) => {
     try {
       setErrors(null);
-      const response = await axios[method](url, body);
+      let client;
+      if (url.startsWith("/api/payments")) {
+        client = buildClient("http://localhost:8085");
+      } else {
+        client = buildClient();
+      }
+      const response = await client[method](url, {
+        ...body,
+        ...props,
+      });
       if (onSuccess) {
         onSuccess(response);
       }
@@ -18,32 +27,33 @@ export default ({ url, method, body, onSuccess }) => {
         return;
       }
       const res = err.response;
-      if (!res.data.errors) {
+      let errors = res.data.errors;
+      if (!errors) {
         let message;
         if (!res.data.message) {
           message = `Something unforgivable happened on the server, status = ${res.status}`;
         } else {
           message = res.data.message;
         }
-        setErrors([{ message }]);
-      } else {
-        setErrors(
-          <div className="alert alert-danger">
-            <h4>Oh Snap...</h4>
-            <ul className="my-0">
-              {res.data.errors.map((err) =>
-                err.field ? (
-                  <li
-                    key={err.field + err.message}
-                  >{`${err.field}: ${err.message}`}</li>
-                ) : (
-                  <li key={err.message}>{err.message}</li>
-                )
-              )}
-            </ul>
-          </div>
-        );
+        errors = [{ message: message }];
+        // setErrors({errors: [{message: message}]});
       }
+      setErrors(
+        <div className="alert alert-danger">
+          <h4>Oh Snap...</h4>
+          <ul className="my-0">
+            {errors.map((err) =>
+              err.field ? (
+                <li
+                  key={err.field + err.message}
+                >{`${err.field}: ${err.message}`}</li>
+              ) : (
+                <li key={err.message}>{err.message}</li>
+              )
+            )}
+          </ul>
+        </div>
+      );
     }
   };
 

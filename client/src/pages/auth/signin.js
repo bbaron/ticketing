@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import useRequest from "../../hooks/use-request";
 
 const Signin = ({ onUserChange }) => {
-  let history = useHistory();
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { doRequest, errors } = useRequest({
