@@ -1,43 +1,16 @@
 server:
   port: 8080
-logging:
-  level:
-    app: trace
-    org:
-      springframework:
-        cloud:
-          netflix:
-            zuul: trace
 spring:
-  mvc:
-    log-request-details: true
-    log-resolved-exception: true
-zuul:
-  sensitive-headers: Authorization, Cookie, Set-Cookie
-  routes:
-    auth:
-      path: /api/users/**
-      service-id: auth
-    tickets:
-      path: /api/tickets/**
-      service-id: tickets
-    orders:
-      path: /api/orders/**
-      service-id: orders
-    payments:
-      path: /api/payments/**
-      service-id: payments
-    ping:
-      path: /api/ping/**
-      url: forward:/ping
-      stripPrefix: true
-    client:
-      path: /**
-      url: http://localhost:3000
-  trace-request-body: true
-  include-debug-header: true
-  host:
-    connect-timeout-millis: 30000
-
-ribbon:
-  ConnectTimeout: 30000
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/api/**]':
+            allowed-headers: "*"
+            allowed-origins: "http://localhost:3000"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+        add-to-simple-url-handler-mapping: true

@@ -13,7 +13,9 @@ const TicketShow = () => {
     body: {
       ticketId: ticketId,
     },
-    onSuccess: ({ data }) => history.push(`/orders/${data.id}`),
+    onSuccess: ({ data }) => {
+      history.push(`/orders/${data.id}`);
+    },
   });
   useEffect(() => {
     (async function () {

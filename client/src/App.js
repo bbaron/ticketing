@@ -11,10 +11,12 @@ import { removeAuthInfo, setAuthInfo } from "./components/auth-info";
 import TicketNew from "./pages/tickets/new";
 import TicketShow from "./pages/tickets/show";
 import OrderShow from "./pages/orders/show";
+import OrderIndex from "./pages/orders";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tickets, setTickets] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     (async function () {
@@ -36,6 +38,22 @@ function App() {
     fetchTickets();
   };
 
+  const fetchOrders = async () => {
+    const response = await api().get("/api/orders");
+    console.log("fetched orders", response.data["orders"]);
+    setOrders(response.data["orders"]);
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const onOrdersUpdated = () => {
+    fetchOrders();
+  };
+
+  const NotFound = () => <h1>404 Not Found</h1>;
+
   const onUserChange = (user) => {
     if (!user) {
       removeAuthInfo();
@@ -54,6 +72,9 @@ function App() {
             <Route path="/" exact>
               <LandingPage currentUser={currentUser} tickets={tickets} />
             </Route>
+            <Route path="/orders" exact>
+              <OrderIndex orders={orders} />
+            </Route>
             <Route path="/auth/signin">
               <Signin onUserChange={onUserChange} />
             </Route>
@@ -70,8 +91,13 @@ function App() {
               <TicketShow />
             </Route>
             <Route path="/orders/:orderId">
-              <OrderShow currentUser={currentUser} />
+              <OrderShow
+                currentUser={currentUser}
+                onTicketsUpdated={onTicketsUpdated}
+                onOrdersUpdated={onOrdersUpdated}
+              />
             </Route>
+            <Route component={NotFound} />
           </Switch>
         </div>
       </BrowserRouter>

@@ -7,12 +7,12 @@ export default ({ url, method, body, onSuccess }) => {
   const doRequest = async (props = {}) => {
     try {
       setErrors(null);
-      let client;
-      if (url.startsWith("/api/payments")) {
-        client = buildClient("http://localhost:8085");
-      } else {
-        client = buildClient();
-      }
+      let client = buildClient();
+      // if (url.startsWith("/api/payments")) {
+      //   client = buildClient("http://localhost:8080");
+      // } else {
+      //   client = buildClient();
+      // }
       const response = await client[method](url, {
         ...body,
         ...props,

@@ -16,13 +16,13 @@ class ApiTests {
 
     @BeforeAll
     internal fun setUp() {
-        try {
-            val response = api.ping().execute()
-            assumeThat(response.isSuccessful).isTrue()
-            assumeThat(response.body()).isEqualTo("pong")
-        } catch (e: Throwable) {
-            assumeThat(false).isTrue()
-        }
+//        try {
+//            val response = api.ping().execute()
+//            assumeThat(response.isSuccessful).isTrue()
+//            assumeThat(response.body()).isEqualTo("pong")
+//        } catch (e: Throwable) {
+//            assumeThat(false).isTrue()
+//        }
     }
 
     @Test
@@ -252,7 +252,7 @@ class ApiTests {
         @Order(14)
         @DisplayName("make payment on order")
         internal fun `make payment on order`() {
-            val paymentApi = Api.create("http://localhost:8085")
+            val paymentApi = Api.create("http://localhost:8080")
             val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
             println("make payment for order $orderId")
             val paymentRequest = PaymentRequest("tok_visa", orderId)

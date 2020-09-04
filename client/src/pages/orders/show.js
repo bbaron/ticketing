@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import StripeCheckout from "react-stripe-checkout";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import api from "../../api/build-client";
 import useRequest from "../../hooks/use-request";
 
-const OrderShow = ({ currentUser }) => {
+const OrderShow = ({ currentUser, onTicketsUpdated, onOrdersUpdated }) => {
+  const history = useHistory();
   const stripeKey =
     "pk_test_51HMK5JC0jjNENKUNYdWJ3S8La9OmNPlmhl4dML0hdlWS7hNcA43I15evgVosEpaiOFgVyAL0nHvWMPJ48bmnnBh600iXqKONgL";
   const [order, setOrder] = useState({});
@@ -36,6 +37,9 @@ const OrderShow = ({ currentUser }) => {
     },
     onSuccess: (payment) => {
       console.log(payment);
+      onTicketsUpdated();
+      onOrdersUpdated();
+      history.push("/orders");
     },
   });
   if (!order.id) {
@@ -45,13 +49,15 @@ const OrderShow = ({ currentUser }) => {
     return <div>Order expired</div>;
   }
 
+  const onToken = (token) => {
+    console.log(`stripe token: ${token.id}`);
+    doRequest({ token: token.id });
+  };
   return (
     <div>
       <p>{timeLeft} seconds until orders expired</p>
       <StripeCheckout
-        token={({ id }) => {
-          doRequest({ token: id });
-        }}
+        token={onToken}
         stripeKey={stripeKey}
         amount={order.ticket.price * 100}
         email={currentUser.email}
