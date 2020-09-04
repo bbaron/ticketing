@@ -37,7 +37,7 @@ class TicketCreateTests {
     @Test
     @DisplayName("only be access if the user is signed in")
     void test2() throws Exception {
-        mvc.perform(post("/api/tickets"))
+        mvc.perform(post("/api/tickets/"))
                 .andDo(print())
                 .andExpect(status().is(403));
     }

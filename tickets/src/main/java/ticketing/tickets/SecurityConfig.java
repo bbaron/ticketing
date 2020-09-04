@@ -13,11 +13,11 @@ public class SecurityConfig implements HttpSecurityCustomizer {
     @Override
     public void customize(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers(POST, "/api/tickets").authenticated()
-                .antMatchers(POST, "/").authenticated()
-                .antMatchers(PUT, "/api/tickets/*").authenticated()
-                .antMatchers(PUT, "/*").authenticated()
-                .antMatchers(GET, "/**").permitAll()
+                .mvcMatchers(POST, "/api/tickets").authenticated()
+                .mvcMatchers(POST, "/").authenticated()
+                .mvcMatchers(PUT, "/api/tickets/*").authenticated()
+                .mvcMatchers(PUT, "/*").authenticated()
+                .mvcMatchers(GET, "/**").permitAll()
         ;
 
     }
