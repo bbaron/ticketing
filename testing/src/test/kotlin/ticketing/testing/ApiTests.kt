@@ -16,13 +16,11 @@ class ApiTests {
 
     @BeforeAll
     internal fun setUp() {
-//        try {
-//            val response = api.ping().execute()
-//            assumeThat(response.isSuccessful).isTrue()
-//            assumeThat(response.body()).isEqualTo("pong")
-//        } catch (e: Throwable) {
-//            assumeThat(false).isTrue()
-//        }
+        try {
+            api.getCurrentUser().execute()
+        } catch (e: Throwable) {
+            assumeThat(false).isTrue()
+        }
     }
 
     @Test
