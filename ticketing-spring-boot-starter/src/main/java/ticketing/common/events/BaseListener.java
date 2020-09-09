@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ticketing.common.json.JsonOperations;
 
+@Deprecated
 public abstract class BaseListener<E> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final JsonOperations jsonOperations;

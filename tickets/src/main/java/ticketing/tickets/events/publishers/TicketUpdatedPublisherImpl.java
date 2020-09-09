@@ -9,7 +9,8 @@ import ticketing.common.json.JsonOperations;
 
 import static ticketing.common.events.Subject.TicketUpdated;
 
-@Component
+//@Component
+@Deprecated
 public class TicketUpdatedPublisherImpl extends BasePublisher<TicketUpdatedEvent>
         implements TicketUpdatedPublisher {
     public TicketUpdatedPublisherImpl(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {

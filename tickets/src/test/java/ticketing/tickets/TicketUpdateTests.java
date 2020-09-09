@@ -11,11 +11,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.events.Messenger;
+import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
+import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,7 +29,9 @@ class TicketUpdateTests {
     @Autowired
     MockMvc mvc;
     @MockBean
-    Messenger messenger;
+    TicketUpdatedPublisher ticketUpdatedPublisher;
+    @MockBean
+    TicketCreatedPublisher ticketCreatedPublisher;
     @Autowired
     TicketRepository ticketRepository;
 
@@ -154,7 +156,6 @@ class TicketUpdateTests {
                 .getResponse()
                 .getContentAsString();
         var ticket = objectMapper.readValue(response, TicketResponse.class);
-        reset(messenger);
         var title = "qwerty";
         request = """
                 {"title": "%s", "price": 30}
@@ -164,10 +165,7 @@ class TicketUpdateTests {
                 .content(request))
                 .andDo(print())
                 .andExpect(status().is(200));
-        verify(messenger).convertAndSend(anyString(), anyString(),
-                contains("""
-                        "title":"%s"
-                        """.formatted(title).strip()));
+        verify(ticketUpdatedPublisher).publish(any());
     }
 
     @Test
@@ -197,6 +195,7 @@ class TicketUpdateTests {
                 .content(request))
                 .andDo(print())
                 .andExpect(status().is(400));
+        verify(ticketUpdatedPublisher, never()).publish(any());
 
     }
 }

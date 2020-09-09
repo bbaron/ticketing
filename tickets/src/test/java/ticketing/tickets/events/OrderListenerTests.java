@@ -15,8 +15,10 @@ import ticketing.tickets.events.listeners.OrderCreatedListener;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @SpringBootTest
 @MockBean(AbstractMongoEventListener.class)
+@Disabled
 public class OrderListenerTests {
     @Autowired
     OrderCreatedListener orderCreatedListener;

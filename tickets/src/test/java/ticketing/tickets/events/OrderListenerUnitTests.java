@@ -1,5 +1,6 @@
 package ticketing.tickets.events;
 
+import org.junit.jupiter.api.Disabled;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
 import ticketing.tickets.events.listeners.OrderCreatedEvent;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
+@Disabled
 public class OrderListenerUnitTests {
     private OrderCreatedListener orderCreatedListener;
     @Mock

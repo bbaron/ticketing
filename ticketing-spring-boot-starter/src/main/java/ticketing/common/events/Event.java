@@ -2,6 +2,7 @@ package ticketing.common.events;
 
 import java.util.UUID;
 
+@Deprecated
 public interface Event {
     default String id() {
         return UUID.randomUUID().toString();

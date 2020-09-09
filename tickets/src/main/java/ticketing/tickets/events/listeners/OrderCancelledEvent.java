@@ -2,6 +2,7 @@ package ticketing.tickets.events.listeners;
 
 import ticketing.common.events.Event;
 
+@Deprecated
 public class OrderCancelledEvent implements Event {
     public String id;
     public Ticket ticket = new Ticket();

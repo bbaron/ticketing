@@ -11,7 +11,8 @@ import ticketing.tickets.events.publishers.TicketCreatedPublisher;
 import ticketing.tickets.events.publishers.TicketUpdatedEvent;
 import ticketing.tickets.events.publishers.TicketUpdatedPublisher;
 
-@Component
+//@Component
+@Deprecated
 public class MongoTicketListener extends AbstractOnInsertOrUpdateMongoEventListener<Ticket> implements MongoTicketingListener<Ticket> {
     private final TicketCreatedPublisher ticketCreatedPublisher;
     private final TicketUpdatedPublisher ticketUpdatedPublisher;

@@ -23,7 +23,7 @@
 			<version>${stripe.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.example</groupId>
+			<groupId>ticketing</groupId>
 			<artifactId>ticketing-spring-boot-starter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>

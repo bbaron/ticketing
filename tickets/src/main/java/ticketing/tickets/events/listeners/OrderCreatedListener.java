@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 import ticketing.common.events.BaseListener;
 import ticketing.common.json.JsonOperations;
 
-@Component
+//@Component
+@Deprecated
 public class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final TicketRepository ticketRepository;

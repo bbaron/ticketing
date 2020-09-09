@@ -8,8 +8,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.events.Messenger;
 import ticketing.common.test.MockMvcSetup;
+import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
+import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
 
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verify;
@@ -24,7 +27,9 @@ class TicketCreateTests {
     @Autowired
     MockMvc mvc;
     @MockBean
-    Messenger messenger;
+    TicketCreatedPublisher ticketCreatedPublisher;
+    @MockBean
+    TicketUpdatedPublisher ticketUpdatedPublisher;
 
     @Test
     @DisplayName("has a route handler listening /api/tickets for post requests")
@@ -110,8 +115,7 @@ class TicketCreateTests {
                 .andDo(print())
                 .andExpect(status().is(201));
 
-        verify(messenger).convertAndSend(anyString(), anyString(),
-                contains("\"title\":\"%s\"".formatted(title)));
+        verify(ticketCreatedPublisher).publish(any());
     }
 
 }

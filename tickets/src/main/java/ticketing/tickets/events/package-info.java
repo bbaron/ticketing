@@ -1,3 +1,4 @@
+@Deprecated
 @NonNullApi
 package ticketing.tickets.events;
 

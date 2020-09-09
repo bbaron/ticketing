@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.common.json.JsonOperations;
 
+@Deprecated
 public abstract class BasePublisher<E extends Event> implements Publisher<E> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Messenger messenger;

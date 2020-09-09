@@ -30,6 +30,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>messaging-lib</module>
         <module>ticketing-spring-boot-starter</module>
         <module>tickets</module>
         <module>orders</module>

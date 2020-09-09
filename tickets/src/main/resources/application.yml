@@ -1,0 +1,40 @@
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          servlet:
+            view:
+              freemarker: ERROR
+spring:
+  data:
+    mongodb:
+      database: tickets
+  mvc:
+    log-request-details: true
+    log-resolved-exception: true
+  cloud:
+    stream:
+      function:
+        definition: ticketCreated;ticketUpdated;orderCreated;orderCancelled
+      bindings:
+        ticketCreated-out-0:
+          destination: ticketCreated
+        ticketUpdated-out-0:
+          destination: ticketUpdated
+        orderCreated-in-0:
+          destination: orderCreated
+          group: tickets.orderCreated
+        orderCancelled-in-0:
+          destination: orderCancelled
+          group: tickets.orderCancelled

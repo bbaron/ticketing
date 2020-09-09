@@ -1,5 +1,6 @@
 package ticketing.tickets.events;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.junit.RabbitAvailable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @RabbitAvailable
+@Disabled
 class MongoTicketListenerTests {
     @Autowired
     TicketRepository repository;

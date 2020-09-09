@@ -3,6 +3,7 @@ package ticketing.common.events;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
 
+@Deprecated
 public class RabbitMessenger implements Messenger {
     private final RabbitOperations rabbitOperations;
 

@@ -6,7 +6,8 @@ import ticketing.common.json.JsonOperations;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
 
-@Component
+//@Component
+@Deprecated
 public class OrderCancelledListener extends BaseListener<OrderCancelledEvent> {
     private final TicketRepository ticketRepository;
     public OrderCancelledListener(JsonOperations jsonOperations, TicketRepository ticketRepository) {

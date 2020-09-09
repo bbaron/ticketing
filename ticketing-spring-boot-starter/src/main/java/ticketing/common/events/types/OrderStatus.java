@@ -2,6 +2,7 @@ package ticketing.common.events.types;
 
 import java.util.EnumSet;
 
+@Deprecated
 public enum OrderStatus {
     // When the order has been created, but the
     // ticket it is trying to order has not been reserved

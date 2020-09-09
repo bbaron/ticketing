@@ -3,6 +3,7 @@ package ticketing.tickets.events.publishers;
 import ticketing.common.events.Event;
 
 @SuppressWarnings("unused")
+@Deprecated
 public class TicketUpdatedEvent implements Event {
     public String id, title, userId;
     public Integer price;

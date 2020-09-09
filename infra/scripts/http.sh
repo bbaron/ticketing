@@ -43,6 +43,8 @@ else
   exit 1
 fi
 
+exit 0
+
 # create order
 order_id=$($HTTP POST ":$port/api/orders" "$auth_header" "$content_type" "ticketId=$ticket_id" | $JQ .id)
 if [[ "$order_id" == 'null' ]]; then

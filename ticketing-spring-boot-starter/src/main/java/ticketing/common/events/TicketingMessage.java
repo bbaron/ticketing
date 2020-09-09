@@ -1,5 +1,6 @@
 package ticketing.common.events;
 
+@Deprecated
 public class TicketingMessage<E> {
     private Subject subject;
     private E event;

@@ -3,6 +3,7 @@ package ticketing.common.events;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 
+@Deprecated
 public interface Messenger {
     /**
      * Convert a Java object to an Amqp {@link Message} and send it to a specific exchange
