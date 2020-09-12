@@ -7,7 +7,8 @@ import ticketing.common.events.Messenger;
 import ticketing.common.events.Subject;
 import ticketing.common.json.JsonOperations;
 
-@Component
+//@Component
+@Deprecated
 public class ExpirationCompletedPublisher extends BasePublisher<ExpirationCompletedEvent> {
     protected ExpirationCompletedPublisher(Messenger messenger, JsonOperations jsonOperations, TicketingProperties properties) {
         super(messenger, jsonOperations, properties);

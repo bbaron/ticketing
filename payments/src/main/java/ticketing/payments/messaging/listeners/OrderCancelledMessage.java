@@ -1,16 +1,13 @@
-package ticketing.payments.events.listeners;
+package ticketing.payments.messaging.listeners;
 
-import ticketing.common.events.Event;
-
-@Deprecated
-public class OrderCancelledEvent implements Event {
+public class OrderCancelledMessage {
     public String id;
     public Long version;
 
-    public OrderCancelledEvent() {
+    public OrderCancelledMessage() {
     }
 
-    public OrderCancelledEvent(String id, Long version) {
+    public OrderCancelledMessage(String id, Long version) {
         this.id = id;
         this.version = version;
     }

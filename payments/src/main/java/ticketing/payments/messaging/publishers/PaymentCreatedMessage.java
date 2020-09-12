@@ -1,17 +1,14 @@
-package ticketing.payments.events.publishers;
+package ticketing.payments.messaging.publishers;
 
-import ticketing.common.events.Event;
-
-@Deprecated
-public class PaymentCreatedEvent implements Event {
+public class PaymentCreatedMessage {
     public String id;
     public String orderId;
     public String stripeId;
 
-    public PaymentCreatedEvent() {
+    public PaymentCreatedMessage() {
     }
 
-    public PaymentCreatedEvent(String id, String orderId, String stripeId) {
+    public PaymentCreatedMessage(String id, String orderId, String stripeId) {
         this.id = id;
         this.orderId = orderId;
         this.stripeId = stripeId;

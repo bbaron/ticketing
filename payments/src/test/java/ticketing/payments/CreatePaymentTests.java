@@ -1,21 +1,24 @@
 package ticketing.payments;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Example;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.test.MockMvcSetup;
-import ticketing.payments.events.publishers.PaymentCreatedPublisher;
+import ticketing.messaging.test.MessageIO;
+import ticketing.messaging.test.TestMessagingConfiguration;
+import ticketing.payments.messaging.publishers.PaymentCreatedMessage;
 
 import static org.apache.commons.lang3.RandomStringUtils.random;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -26,7 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ticketing.messaging.types.OrderStatus.Cancelled;
 import static ticketing.messaging.types.OrderStatus.Created;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @MockMvcSetup
+@Import(TestMessagingConfiguration.class)
 class CreatePaymentTests {
     @Autowired
     MockMvc mvc;
@@ -36,8 +41,10 @@ class CreatePaymentTests {
     PaymentService paymentService;
     @Autowired
     PaymentRepository paymentRepository;
-    @MockBean
-    PaymentCreatedPublisher paymentCreatedPublisher;
+    @Autowired
+    MessageIO messageIO;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     @DisplayName("return 404 when order does not exist")
@@ -52,6 +59,7 @@ class CreatePaymentTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+        assertTrue(messageIO.neverReceived(0, "paymentCreated"));
 
     }
 
@@ -73,6 +81,7 @@ class CreatePaymentTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().isForbidden());
+        assertTrue(messageIO.neverReceived(0, "paymentCreated"));
 
     }
     @Test
@@ -93,6 +102,7 @@ class CreatePaymentTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+        assertTrue(messageIO.neverReceived(0, "paymentCreated"));
     }
 
     @Test
@@ -120,6 +130,8 @@ class CreatePaymentTests {
                 .andExpect(status().isCreated());
         var payment = new Payment(order.id, stripeCharge.chargeId);
         assertTrue(paymentRepository.findOne(Example.of(payment)).isPresent());
-        verify(paymentCreatedPublisher).publish(any());
+        var message = messageIO.output.receive(5,"paymentCreated");
+        var payload = objectMapper.readValue(message.getPayload(), PaymentCreatedMessage.class);
+        assertEquals(stripeCharge.chargeId, payload.stripeId);
     }
 }

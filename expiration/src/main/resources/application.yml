@@ -1,0 +1,13 @@
+server:
+  port: 8084
+spring:
+  cloud:
+    stream:
+      function:
+        definition: orderCreated;expirationCompleted
+      bindings:
+        orderCreated-in-0:
+          destination: orderCreated
+          group: expiration.orderCreated
+        expirationCompleted-out-0:
+          destination: expirationCompleted

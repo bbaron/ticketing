@@ -259,7 +259,7 @@ class ApiIT {
             val order = api.getOrder(orderId, ticketBuyer.jwt)
                     .execute()
                     .body()!!
-            assertThat(order.status).isEqualTo("Complete")
+            assertThat(order.status).isEqualTo("Completed")
         }
     }
 

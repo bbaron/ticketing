@@ -1,4 +1,4 @@
-package ticketing.expiration.events.listeners;
+package ticketing.expiration.redis;
 
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RedissonClient;
@@ -6,18 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import ticketing.expiration.events.MessagingConfiguration;
-import ticketing.expiration.events.publishers.ExpirationCompletedEvent;
-import ticketing.expiration.events.publishers.ExpirationCompletedPublisher;
+import ticketing.expiration.messaging.publishers.ExpirationCompletedMessage;
+import ticketing.expiration.messaging.publishers.ExpirationCompletedPublisher;
 
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.*;
+import static java.lang.Thread.currentThread;
 
 @Component
 public class OrderExpiredListener {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private static final String QUEUE = MessagingConfiguration.REDIS_ORDER_EXPIRED_QUEUE;
+    private static final String QUEUE = RedisConfiguration.REDIS_ORDER_EXPIRED_QUEUE;
     private final RedissonClient redissonClient;
     private final ExpirationCompletedPublisher expirationCompletedPublisher;
 
@@ -38,7 +37,7 @@ public class OrderExpiredListener {
                     break;
                 } else {
                     logger.info("Order {} has expired", orderId);
-                    expirationCompletedPublisher.publish(new ExpirationCompletedEvent(orderId));
+                    expirationCompletedPublisher.publish(new ExpirationCompletedMessage(orderId));
                 }
             } catch (InterruptedException e) {
                 currentThread().interrupt();

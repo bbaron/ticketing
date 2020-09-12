@@ -1,6 +1,4 @@
-package ticketing.expiration.events.listeners;
-
-import ticketing.common.events.Event;
+package ticketing.expiration.messaging.listeners;
 
 import java.time.Instant;
 
@@ -8,12 +6,11 @@ import static java.lang.Math.max;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-@Deprecated
-public class OrderCreatedEvent implements Event {
+public class OrderCreatedMessage {
     public String id;
     public Instant expiresAt;
 
-    public OrderCreatedEvent() {
+    public OrderCreatedMessage() {
     }
 
     public String getId() {

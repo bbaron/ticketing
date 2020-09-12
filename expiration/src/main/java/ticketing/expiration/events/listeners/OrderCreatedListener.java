@@ -1,10 +1,11 @@
 package ticketing.expiration.events.listeners;
 
-import org.springframework.stereotype.Component;
 import ticketing.common.events.BaseListener;
 import ticketing.common.json.JsonOperations;
+import ticketing.expiration.redis.RedisDelayedQueue;
 
-@Component
+//@Component
+@Deprecated
 public class OrderCreatedListener extends BaseListener<OrderCreatedEvent> {
     private final RedisDelayedQueue redisDelayedQueue;
 

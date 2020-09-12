@@ -1,10 +1,9 @@
-package ticketing.payments.events.listeners;
+package ticketing.payments.messaging.listeners;
 
 import ticketing.common.events.Event;
 import ticketing.messaging.types.OrderStatus;
 
-@Deprecated
-public class OrderCreatedEvent implements Event {
+public class OrderCreatedMessage {
     public String id, userId;
     public OrderStatus status;
     public Ticket ticket = new Ticket();

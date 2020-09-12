@@ -1,0 +1,37 @@
+server:
+  port: 8085
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          servlet:
+            view:
+              freemarker:
+                ERROR
+
+spring:
+  data:
+    mongodb:
+      database: payments
+  mvc:
+    log-resolved-exception: true
+    log-request-details: true
+  cloud:
+    stream:
+      function:
+        definition: orderCreated;orderCancelled;paymentCreated
+      bindings:
+        orderCreated-in-0:
+          destination: orderCreated
+          group: payments.orderCreated
+        orderCancelled-in-0:
+          destination: orderCancelled
+          group: payments.orderCancelled
+        paymentCreated-out-0:
+          destination: paymentCreated
