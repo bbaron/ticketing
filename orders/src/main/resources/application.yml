@@ -1,0 +1,35 @@
+server:
+  port: 8082
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+spring:
+  data:
+    mongodb:
+      database: orders
+  mvc:
+    log-request-details: true
+    log-resolved-exception: true
+  cloud:
+    stream:
+      function:
+        definition: ticketCreated;ticketUpdated;orderCreated;orderCancelled;expirationCompleted;paymentCreated
+      bindings:
+        ticketCreated-in-0:
+          destination: ticketCreated
+          group: orders.ticketCreated
+        ticketUpdated-in-0:
+          destination: ticketUpdated
+          group: orders.ticketUpdated
+        expirationCompleted-in-0:
+          destination: expirationCompleted
+          group: orders.expirationCompleted
+        paymentCreated-in-0:
+          destination: paymentCreated
+          group: orders.paymentCreated
+        orderCreated-out-0:
+          destination: orderCreated
+        orderCancelled-out-0:
+          destination: orderCancelled

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.common.events.types.OrderStatus;
+import ticketing.messaging.types.OrderStatus;
 import ticketing.common.test.MockMvcSetup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

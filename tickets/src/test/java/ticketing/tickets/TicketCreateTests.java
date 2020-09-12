@@ -1,35 +1,40 @@
 package ticketing.tickets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.common.events.Messenger;
 import ticketing.common.test.MockMvcSetup;
-import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
-import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
+import ticketing.messaging.test.MessageIO;
+import ticketing.messaging.test.TestMessagingConfiguration;
+import ticketing.tickets.messaging.publishers.TicketCreatedMessage;
 
 import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @MockMvcSetup
+@Import(TestMessagingConfiguration.class)
 class TicketCreateTests {
+    final MockMvc mvc;
+    final MessageIO messageIO;
+    final ObjectMapper objectMapper;
+
     @Autowired
-    MockMvc mvc;
-    @MockBean
-    TicketCreatedPublisher ticketCreatedPublisher;
-    @MockBean
-    TicketUpdatedPublisher ticketUpdatedPublisher;
+    TicketCreateTests(MockMvc mvc, MessageIO messageIO, ObjectMapper objectMapper) {
+        this.mvc = mvc;
+        this.messageIO = messageIO;
+        this.objectMapper = objectMapper;
+    }
 
     @Test
     @DisplayName("has a route handler listening /api/tickets for post requests")
@@ -37,6 +42,7 @@ class TicketCreateTests {
         mvc.perform(get("/api/tickets"))
                 .andDo(print())
                 .andExpect(status().is(not(404)));
+        assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
@@ -45,6 +51,7 @@ class TicketCreateTests {
         mvc.perform(post("/api/tickets/"))
                 .andDo(print())
                 .andExpect(status().is(403));
+        assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
@@ -54,6 +61,7 @@ class TicketCreateTests {
         mvc.perform(post("/api/tickets"))
                 .andDo(print())
                 .andExpect(status().is(not(403)));
+        assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
@@ -76,6 +84,7 @@ class TicketCreateTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
+        assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
@@ -98,6 +107,7 @@ class TicketCreateTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
+        assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
@@ -115,7 +125,9 @@ class TicketCreateTests {
                 .andDo(print())
                 .andExpect(status().is(201));
 
-        verify(ticketCreatedPublisher).publish(any());
+        var message = messageIO.output.receive(5,"ticketCreated");
+        var payload = objectMapper.readValue(message.getPayload(), TicketCreatedMessage.class);
+        assertEquals(title, payload.title);
     }
 
 }

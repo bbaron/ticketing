@@ -10,11 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import ticketing.common.events.Messenger;
 import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
 import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -187,6 +186,7 @@ class TicketUpdateTests {
         var ticket = ticketRepository.findById(ticketId).orElseThrow();
         ticket.setOrderId(ObjectId.get().toHexString());
         ticketRepository.save(ticket);
+        reset(ticketUpdatedPublisher);
         request = """
                 {"title": "qwerty", "price": 200}
                 """;

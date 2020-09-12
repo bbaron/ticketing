@@ -27,7 +27,7 @@ class MongoTicketListenerTests {
     final String user = "user";
 
     @Autowired
-    public MongoTicketListenerTests(TicketRepository repository) {
+    MongoTicketListenerTests(TicketRepository repository) {
         this.repository = repository;
     }
 
@@ -42,7 +42,8 @@ class MongoTicketListenerTests {
     void when_ticket_is_updated_ticket_updated_event_is_emitted() {
         var ticket = new Ticket(request, user);
         ticket = repository.insert(ticket);
-        ticket = repository.findById(ticket.id).orElseThrow();
+        ticket = repository.findById(ticket.id)
+                           .orElseThrow();
         ticket.setOrderId("asdf");
         repository.save(ticket);
         verify(ticketUpdatedPublisher).publish(any(TicketUpdatedMessage.class));

@@ -7,7 +7,7 @@ import ticketing.common.json.JsonOperations;
 import ticketing.payments.Order;
 import ticketing.payments.OrderRepository;
 
-import static ticketing.common.events.types.OrderStatus.Cancelled;
+import static ticketing.messaging.types.OrderStatus.Cancelled;
 
 @Component
 public class OrderCancelledListener extends BaseListener<OrderCancelledEvent> {

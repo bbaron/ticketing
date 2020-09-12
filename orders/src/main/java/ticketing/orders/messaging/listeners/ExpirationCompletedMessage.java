@@ -1,15 +1,12 @@
-package ticketing.orders.events.listeners.expirationcompleted;
+package ticketing.orders.messaging.listeners;
 
-import ticketing.common.events.Event;
-
-@Deprecated
-public class ExpirationCompletedEvent implements Event {
+public class ExpirationCompletedMessage {
     public String orderId;
 
-    public ExpirationCompletedEvent() {
+    public ExpirationCompletedMessage() {
     }
 
-    public ExpirationCompletedEvent(String orderId) {
+    public ExpirationCompletedMessage(String orderId) {
         this.orderId = orderId;
     }
 

@@ -1,6 +1,6 @@
 package ticketing.orders;
 
-import ticketing.common.events.types.OrderStatus;
+import ticketing.messaging.types.OrderStatus;
 
 import java.time.Instant;
 

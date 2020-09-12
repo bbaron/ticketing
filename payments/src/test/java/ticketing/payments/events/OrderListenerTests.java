@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
-import ticketing.common.events.types.OrderStatus;
+import ticketing.messaging.types.OrderStatus;
 import ticketing.payments.Order;
 import ticketing.payments.OrderRepository;
 import ticketing.payments.events.listeners.OrderCancelledListener;
@@ -16,8 +16,8 @@ import java.time.Instant;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.fail;
-import static ticketing.common.events.types.OrderStatus.Cancelled;
-import static ticketing.common.events.types.OrderStatus.Created;
+import static ticketing.messaging.types.OrderStatus.Cancelled;
+import static ticketing.messaging.types.OrderStatus.Created;
 
 @SpringBootTest
 class OrderListenerTests {

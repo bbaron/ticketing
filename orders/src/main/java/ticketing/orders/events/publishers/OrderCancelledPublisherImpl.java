@@ -1,7 +1,5 @@
 package ticketing.orders.events.publishers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.common.events.BasePublisher;
 import ticketing.common.events.Messenger;
@@ -10,9 +8,9 @@ import ticketing.common.json.JsonOperations;
 
 import static ticketing.common.events.Subject.OrderCancelled;
 
-@Component
+//@Component
 public class OrderCancelledPublisherImpl extends BasePublisher<OrderCancelledEvent> implements OrderCancelledPublisher {
-    @Autowired
+//    @Autowired
     public OrderCancelledPublisherImpl(Messenger messenger, JsonOperations jsonOperations,
                                        TicketingProperties properties) {
         super(messenger, jsonOperations, properties);

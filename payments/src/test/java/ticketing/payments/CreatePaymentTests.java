@@ -23,8 +23,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ticketing.common.events.types.OrderStatus.Cancelled;
-import static ticketing.common.events.types.OrderStatus.Created;
+import static ticketing.messaging.types.OrderStatus.Cancelled;
+import static ticketing.messaging.types.OrderStatus.Created;
 
 @MockMvcSetup
 class CreatePaymentTests {

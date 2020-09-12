@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 import ticketing.common.events.BaseListener;
 import ticketing.common.json.JsonOperations;
 
-@Component
+//@Component
+@Deprecated
 public class TicketCreatedListener extends BaseListener<TicketCreatedEvent> {
     private final TicketRepository ticketRepository;
 

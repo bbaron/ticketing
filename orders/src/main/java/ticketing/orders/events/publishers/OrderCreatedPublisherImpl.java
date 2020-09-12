@@ -1,18 +1,16 @@
 package ticketing.orders.events.publishers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ticketing.common.autoconfigure.TicketingProperties;
 import ticketing.common.events.BasePublisher;
 import ticketing.common.events.Messenger;
 import ticketing.common.events.Subject;
 import ticketing.common.json.JsonOperations;
 
-import static ticketing.common.events.Subject.*;
+import static ticketing.common.events.Subject.OrderCreated;
 
-@Component
+//@Component
 public class OrderCreatedPublisherImpl extends BasePublisher<OrderCreatedEvent> implements OrderCreatedPublisher {
-    @Autowired
+//    @Autowired
     public OrderCreatedPublisherImpl(Messenger messenger, JsonOperations jsonOperations,
                                      TicketingProperties properties) {
         super(messenger, jsonOperations, properties);

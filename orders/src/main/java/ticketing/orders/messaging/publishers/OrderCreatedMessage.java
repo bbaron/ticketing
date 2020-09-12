@@ -1,23 +1,22 @@
-package ticketing.orders.events.publishers;
+package ticketing.orders.messaging.publishers;
 
-import ticketing.common.events.Event;
 import ticketing.messaging.types.OrderStatus;
 
 import java.time.Instant;
 
-public class OrderCreatedEvent implements Event {
+public class OrderCreatedMessage {
     public String id, userId;
     public OrderStatus status;
     public Instant expiresAt;
     public Long version;
     public Ticket ticket = new Ticket();
 
-    public OrderCreatedEvent() {
+    public OrderCreatedMessage() {
     }
 
-    public OrderCreatedEvent(String id, String userId,
-                             Instant expiresAt, Long version, OrderStatus status,
-                             String ticketId, Integer ticketPrice) {
+    public OrderCreatedMessage(String id, String userId,
+                               Instant expiresAt, Long version, OrderStatus status,
+                               String ticketId, Integer ticketPrice) {
         this.id = id;
         this.userId = userId;
         this.status = status;

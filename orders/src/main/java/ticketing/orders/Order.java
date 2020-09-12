@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import ticketing.common.events.types.OrderStatus;
+import ticketing.messaging.types.OrderStatus;
 
 import java.time.Instant;
 

@@ -7,11 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ticketing.common.autoconfigure.TicketingProperties;
-import ticketing.common.events.types.OrderStatus;
 import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
 import ticketing.common.exceptions.NotFoundException;
 import ticketing.common.exceptions.RequestValidationException;
+import ticketing.messaging.types.OrderStatus;
 
 import javax.validation.Valid;
 import java.security.Principal;

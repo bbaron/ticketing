@@ -1,7 +1,7 @@
 package ticketing.payments.events.listeners;
 
 import ticketing.common.events.Event;
-import ticketing.common.events.types.OrderStatus;
+import ticketing.messaging.types.OrderStatus;
 
 public class OrderCreatedEvent implements Event {
     public String id, userId;

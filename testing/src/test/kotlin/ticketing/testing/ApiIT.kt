@@ -8,7 +8,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import java.lang.Thread.sleep
 
 @TestMethodOrder(OrderAnnotation::class)
-class ApiTests {
+class ApiIT {
     private val api = Api.create()
     private val faker = Faker()
     private val userRequest = randomUser()
@@ -79,7 +79,7 @@ class ApiTests {
 
         @BeforeAll
         internal fun setUp() {
-            assumeThat(this@ApiTests::userResponse.isInitialized).isTrue()
+            assumeThat(this@ApiIT::userResponse.isInitialized).isTrue()
             ticketSeller = userResponse
             ticketBuyer = signupRandomUser()
             anotherUser = signupRandomUser()

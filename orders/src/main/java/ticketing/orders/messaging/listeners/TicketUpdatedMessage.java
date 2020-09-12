@@ -1,18 +1,17 @@
-package ticketing.orders.events.listeners.ticketupdated;
+package ticketing.orders.messaging.listeners;
 
 import ticketing.common.events.Event;
 
-@Deprecated
-public class TicketUpdatedEvent implements Event {
+public class TicketUpdatedMessage implements Event {
     public String id, title;
     public Integer price;
     public Long version;
     public String orderId;
 
-    public TicketUpdatedEvent() {
+    public TicketUpdatedMessage() {
     }
 
-    public TicketUpdatedEvent(String id, String title, Integer price, Long version, String orderId) {
+    public TicketUpdatedMessage(String id, String title, Integer price, Long version, String orderId) {
         this.id = id;
         this.title = title;
         this.price = price;

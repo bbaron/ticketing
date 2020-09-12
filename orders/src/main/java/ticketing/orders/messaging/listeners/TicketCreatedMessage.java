@@ -1,16 +1,15 @@
-package ticketing.orders.events.listeners.ticketcreated;
+package ticketing.orders.messaging.listeners;
 
 import ticketing.common.events.Event;
 
-@Deprecated
-public class TicketCreatedEvent implements Event {
+public class TicketCreatedMessage implements Event {
     public String id, title;
     public Integer price;
 
-    public TicketCreatedEvent() {
+    public TicketCreatedMessage() {
     }
 
-    public TicketCreatedEvent(String id, String title, Integer price) {
+    public TicketCreatedMessage(String id, String title, Integer price) {
         this.id = id;
         this.title = title;
         this.price = price;
