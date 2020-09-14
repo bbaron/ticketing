@@ -127,7 +127,7 @@ class TicketCreateTests {
 
         var message = messageIO.output.receive(5,"ticketCreated");
         var payload = objectMapper.readValue(message.getPayload(), TicketCreatedMessage.class);
-        assertEquals(title, payload.title);
+        assertEquals(title, payload.getTitle());
     }
 
 }

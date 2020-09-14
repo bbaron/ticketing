@@ -37,7 +37,9 @@ public class TicketController {
                 .stream()
                 .map(Ticket::toTicketResponse)
                 .collect(toList());
-        return new TicketsResponse(tickets);
+        var response = new TicketsResponse(tickets);
+        logger.info("GET /api/tickets: {}", response);
+        return response;
     }
 
     @GetMapping("/{id}")

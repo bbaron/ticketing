@@ -16,6 +16,6 @@ public class TicketsResponse {
 
     @Override
     public String toString() {
-        return "TicketsResponse{tickets=%s}".formatted(tickets);
+        return "TicketsResponse - %s tickets".formatted(tickets.size());
     }
 }

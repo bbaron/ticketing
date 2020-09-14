@@ -1,6 +1,7 @@
 package ticketing.tickets.messaging;
 
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -38,5 +40,12 @@ public class MessageHandlerUnitTests {
         var message = OrderCreatedMessage.of(orderId, ticketId);
         messageHandlers.handleOrderCreated(message);
         verify(ticketRepository).save(argThat(hasProperty("orderId", equalTo(orderId))));
+    }
+
+    @Test
+    void throws_exception_if_no_ticket() {
+        when(ticketRepository.findById(ticketId)).thenReturn(Optional.empty());
+        var message = OrderCreatedMessage.of(orderId, ticketId);
+        assertThrows(IllegalStateException.class, () -> messageHandlers.handleOrderCreated(message));
     }
 }
