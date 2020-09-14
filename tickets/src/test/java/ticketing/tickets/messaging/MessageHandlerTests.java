@@ -8,13 +8,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import ticketing.tickets.Ticket;
 import ticketing.tickets.TicketRepository;
-import ticketing.tickets.TicketRequest;
 import ticketing.tickets.messaging.listeners.OrderCancelledMessage;
 import ticketing.tickets.messaging.listeners.OrderCreatedMessage;
 import ticketing.tickets.messaging.listeners.OrderHandlers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @MockBean(AbstractMongoEventListener.class)
@@ -34,25 +32,27 @@ public class MessageHandlerTests {
 
     @Test
     void created_listener_sets_the_order_id_of_the_ticket() {
-        var ticket = new Ticket(new TicketRequest("concert", 20), userId);
-        ticket = ticketRepository.save(ticket);
-        OrderCreatedMessage message = new OrderCreatedMessage(orderId, ticket.id);
+        var newTicket = Ticket.of("concert", 20, userId);
+        var ticket = ticketRepository.save(newTicket);
+        assertNotNull(ticket.getId());
+        OrderCreatedMessage message = OrderCreatedMessage.of(orderId, ticket.getId());
         orderHandlers.handleOrderCreated(message);
-        ticket = ticketRepository.findById(ticket.id)
+        ticket = ticketRepository.findById(ticket.getId())
                                  .orElseThrow();
-        assertEquals(orderId, ticket.orderId);
+        assertEquals(orderId, ticket.getOrderId());
     }
 
     @Test
     void cancelled_listener_nulls_the_order_id_of_the_ticket() {
-        var ticket = new Ticket(new TicketRequest("concert", 20), userId);
-        ticket.setOrderId(orderId);
+        var ticket = Ticket.of("concert", 20, userId)
+                           .withOrderId(orderId);
         ticket = ticketRepository.save(ticket);
-        var message = new OrderCancelledMessage(orderId, ticket.id);
+        assertNotNull(ticket.getId());
+        var message = OrderCancelledMessage.of(orderId, ticket.getId());
         orderHandlers.handleOrderCancelled(message);
-        ticket = ticketRepository.findById(ticket.id)
+        ticket = ticketRepository.findById(ticket.getId())
                                  .orElseThrow();
-        assertNull(ticket.orderId);
+        assertNull(ticket.getOrderId());
 
     }
 }

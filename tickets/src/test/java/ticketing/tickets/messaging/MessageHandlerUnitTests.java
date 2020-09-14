@@ -33,9 +33,9 @@ public class MessageHandlerUnitTests {
 
     @Test
     void sets_the_order_id_of_the_ticket() {
-        var ticket = new Ticket(ticketId, "concert", 20, "user", null);
+        var ticket = new Ticket(ticketId, "concert", 20, "user", null, null);
         when(ticketRepository.findById(ticketId)).thenReturn(Optional.of(ticket));
-        var message = new OrderCreatedMessage(orderId, ticketId);
+        var message = OrderCreatedMessage.of(orderId, ticketId);
         messageHandlers.handleOrderCreated(message);
         verify(ticketRepository).save(argThat(hasProperty("orderId", equalTo(orderId))));
     }

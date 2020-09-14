@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
 import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
 
+import java.util.Map;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -46,16 +48,16 @@ class TicketUpdateTests {
         mvc.perform(put("/api/tickets/{id}", "asdf")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is(404));
+           .andDo(print())
+           .andExpect(status().is(404));
     }
 
     @Test
     @DisplayName("only be access if the user is signed in")
     void test2() throws Exception {
         mvc.perform(put("/api/tickets/{id}", "asdf"))
-                .andDo(print())
-                .andExpect(status().is(403));
+           .andDo(print())
+           .andExpect(status().is(403));
     }
 
     @Test
@@ -68,19 +70,19 @@ class TicketUpdateTests {
                 .with(user("user1"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(201))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        var ticket = objectMapper.readValue(response, TicketResponse.class);
+                          .andDo(print())
+                          .andExpect(status().is(201))
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+        var ticket = objectMapper.readValue(response, Map.class);
 
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
                 .with(user("user2"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(403));
+           .andDo(print())
+           .andExpect(status().is(403));
     }
 
     @Test
@@ -94,21 +96,21 @@ class TicketUpdateTests {
                 .with(user("user1"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(201))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        var ticket = objectMapper.readValue(response, TicketResponse.class);
+                          .andDo(print())
+                          .andExpect(status().is(201))
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+        var ticket = objectMapper.readValue(response, Map.class);
 
         request = """
                 {"price": 10}
                 """;
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -122,21 +124,21 @@ class TicketUpdateTests {
                 .with(user("user1"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(201))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        var ticket = objectMapper.readValue(response, TicketResponse.class);
+                          .andDo(print())
+                          .andExpect(status().is(201))
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+        var ticket = objectMapper.readValue(response, Map.class);
 
         request = """
                 {"price": -10, "title": "asdf"}
                 """;
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -149,21 +151,21 @@ class TicketUpdateTests {
         var response = mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(201))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        var ticket = objectMapper.readValue(response, TicketResponse.class);
+                          .andDo(print())
+                          .andExpect(status().is(201))
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+        var ticket = objectMapper.readValue(response, Map.class);
         var title = "qwerty";
         request = """
                 {"title": "%s", "price": 30}
                 """.formatted(title);
-        mvc.perform(put("/api/tickets/{id}", ticket.getId())
+        mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(200));
+           .andDo(print())
+           .andExpect(status().is(200));
         verify(ticketUpdatedPublisher).publish(any());
     }
 
@@ -177,14 +179,17 @@ class TicketUpdateTests {
         var response = mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(201))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        var ticketId = objectMapper.readValue(response, TicketResponse.class).getId();
-        var ticket = ticketRepository.findById(ticketId).orElseThrow();
-        ticket.setOrderId(ObjectId.get().toHexString());
+                          .andDo(print())
+                          .andExpect(status().is(201))
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+        var ticketId = objectMapper.readValue(response, Map.class)
+                                   .get("id").toString();
+        var ticket = ticketRepository.findById(ticketId)
+                                     .orElseThrow()
+                                     .withOrderId(ObjectId.get()
+                                                          .toHexString());
         ticketRepository.save(ticket);
         reset(ticketUpdatedPublisher);
         request = """
@@ -193,8 +198,8 @@ class TicketUpdateTests {
         mvc.perform(put("/api/tickets/{id}", ticketId)
                 .contentType(APPLICATION_JSON)
                 .content(request))
-                .andDo(print())
-                .andExpect(status().is(400));
+           .andDo(print())
+           .andExpect(status().is(400));
         verify(ticketUpdatedPublisher, never()).publish(any());
 
     }

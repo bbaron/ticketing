@@ -35,7 +35,7 @@ public class TicketController {
         var tickets = ticketRepository
                 .findByOrderIdIsNotNull()
                 .stream()
-                .map(TicketResponse::new)
+                .map(Ticket::toTicketResponse)
                 .collect(toList());
         return new TicketsResponse(tickets);
     }
@@ -43,8 +43,8 @@ public class TicketController {
     @GetMapping("/{id}")
     TicketResponse findById(@PathVariable String id) {
         return ticketRepository.findById(id)
-                .map(TicketResponse::new)
-                .orElseThrow(NotFoundException::new);
+                               .map(Ticket::toTicketResponse)
+                               .orElseThrow(NotFoundException::new);
     }
 
     @PostMapping
@@ -52,10 +52,10 @@ public class TicketController {
         if (result.hasErrors()) {
             throw new RequestValidationException(result);
         }
-        var ticket = new Ticket(request, principal.getName());
+        var ticket = Ticket.of(request.getTitle(), request.getPrice(), principal.getName());
         ticket = ticketRepository.insert(ticket);
         logger.info("saved {}", ticket);
-        return status(CREATED).body(new TicketResponse(ticket));
+        return status(CREATED).body(ticket.toTicketResponse());
     }
 
     @PutMapping("/{id}")
@@ -65,17 +65,19 @@ public class TicketController {
         if (result.hasErrors()) {
             throw new RequestValidationException(result);
         }
-        var ticket = ticketRepository.findById(id).orElseThrow(NotFoundException::new);
+        var ticket = ticketRepository.findById(id)
+                                     .orElseThrow(NotFoundException::new);
         if (ticket.reserved()) {
             throw new BadRequestException("Cannot edit a reserved ticket");
         }
         if (!Objects.equals(ticket.getUserId(), principal.getName())) {
             throw new ForbiddenException();
         }
-        ticket = ticket.update(request.getTitle(), request.getPrice());
-        ticket = ticketRepository.save(ticket);
-        logger.info("updated {}", ticket);
-        return ok(new TicketResponse(ticket));
+        var updated = ticket.withTitle(request.getTitle())
+                       .withPrice(request.getPrice());
+        var saved = ticketRepository.save(updated);
+        logger.info("updated {}", saved);
+        return ok(saved.toTicketResponse());
     }
 
 }

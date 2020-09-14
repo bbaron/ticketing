@@ -7,9 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
-import ticketing.tickets.Ticket;
-import ticketing.tickets.TicketRepository;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,12 +21,14 @@ class TicketVersionTests {
     @Test
     @DisplayName("implements optimistic concurrency control")
     void test1() {
-        var ticket = new Ticket(null, "concert", 5, "asdf", null);
+        var ticket = new Ticket(null, "concert", 5, "asdf", null, null);
         ticket = repository.insert(ticket);
-        var t1 = repository.findById(ticket.getId()).orElseThrow();
-        var t2 = repository.findById(ticket.getId()).orElseThrow();
-        t1.setPrice(10);
-        t2.setPrice(15);
+        var t1 = repository.findById(ticket.getId())
+                           .orElseThrow()
+                           .withPrice(10);
+        var t2 = repository.findById(ticket.getId())
+                           .orElseThrow()
+                           .withPrice(15);
         repository.save(t1);
         assertThrows(OptimisticLockingFailureException.class, () -> repository.save(t2));
     }
@@ -35,13 +36,13 @@ class TicketVersionTests {
     @Test
     @DisplayName("increments version on multiple saves")
     void test2() {
-        var ticket = new Ticket(null, "concert", 5, "asdf", null);
+        var ticket = new Ticket(null, "concert", 5, "asdf", null, null);
         ticket = repository.insert(ticket);
-        var v = ticket.version;
-        assertEquals(v, ticket.version);
-        repository.save(ticket);
-        assertEquals(++v, ticket.version);
-        repository.save(ticket);
-        assertEquals(++v, ticket.version);
+        long v = requireNonNull(ticket.getVersion());
+        assertEquals(v, ticket.getVersion());
+        var t2 = repository.save(ticket);
+        assertEquals(++v, t2.getVersion());
+        var t3 = repository.save(t2);
+        assertEquals(++v, t3.getVersion());
     }
 }

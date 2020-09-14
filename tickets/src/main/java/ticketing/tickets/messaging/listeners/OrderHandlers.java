@@ -15,23 +15,25 @@ public class OrderHandlers {
 
     public void handleOrderCreated(OrderCreatedMessage message) {
         // find ticket
-        ticketRepository.findById(message.ticket.id)
+        ticketRepository.findById(message.getTicket().getId())
                         .ifPresentOrElse(
                                 ticket -> {
                                     // mark ticket reserved by setting orderId property
-                                    ticket = ticket.withOrderId(message.id);
+                                    var updated = ticket.withOrderId(message.getId());
 
-                                    logger.info("received: {} updating {}", message, ticket);
+                                    logger.info("received: {} updating {}", message, updated);
 
                                     // save ticket
-                                    ticketRepository.save(ticket);
+                                    ticketRepository.save(updated);
                                 },
-                                () -> logger.error("{}: No such ticket", message)
+                                () -> {
+                                    throw new IllegalStateException("%s: No such ticket".formatted(message));
+                                }
                         );
     }
-    public void handleOrderCancelled(OrderCancelledMessage event) {
-        Ticket ticket = ticketRepository.findById(event.ticket.id)
-                                        .orElseThrow(() -> new IllegalStateException("%s: No such ticket".formatted(event)));
+    public void handleOrderCancelled(OrderCancelledMessage message) {
+        Ticket ticket = ticketRepository.findById(message.getTicket().getId())
+                                        .orElseThrow(() -> new IllegalStateException("%s: No such ticket".formatted(message)));
         ticket = ticket.withoutOrderId();
         ticketRepository.save(ticket);
 

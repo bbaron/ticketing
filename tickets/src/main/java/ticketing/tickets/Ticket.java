@@ -1,126 +1,53 @@
 package ticketing.tickets;
 
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import lombok.With;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.lang.Nullable;
+import ticketing.tickets.messaging.publishers.TicketCreatedMessage;
+import ticketing.tickets.messaging.publishers.TicketUpdatedMessage;
 
-import static java.util.Objects.requireNonNull;
-
-@SuppressWarnings("unused")
 @Document
+@Value
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
 public class Ticket {
     @Id
-    public String id;
-    public String title;
-    public Integer price;
-    public String userId;
+    @With
+    String id;
+    @With
+    String title;
+    @With
+    Integer price;
+    String userId;
     @Version
-    public Long version;
-    public String orderId;
+    Long version;
+    @With
+    String orderId;
 
-    public Ticket() {
-    }
-
-    @PersistenceConstructor
-    public Ticket(@Nullable String id, String title, Integer price, String userId, @Nullable Long version) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.userId = userId;
-        this.version = version;
-        this.orderId = null;
-    }
-
-    public Ticket(TicketRequest ticketRequest, String userId) {
-        this(null,
-                ticketRequest.getTitle(),
-                ticketRequest.getPrice(),
-                requireNonNull(userId, "userId is required"),
-                null);
-    }
-
-    public Ticket(String id, String title, Integer price, String userId, Long version, String orderId) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.userId = userId;
-        this.version = version;
-        this.orderId = orderId;
-    }
-
-    public Ticket withId(String id) {
-        // used by spring data mongo
-        return new Ticket(id, title, price, userId, version, orderId);
-    }
-
-    public Ticket withOrderId(String orderId) {
-        return new Ticket(id, title, price, userId, version, orderId);
+    public static Ticket of(String title, int price, String userId) {
+        return new Ticket(null, title, price, userId, null, null);
     }
 
     public Ticket withoutOrderId() {
-        return new Ticket(id, title, price, userId, version);
-    }
-
-    public Ticket update(String title, Integer price) {
-        return new Ticket(id, title, price, userId, version, orderId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    @Override
-    public String toString() {
-        return "Ticket{id='%s', title='%s', price=%s, userId='%s', version=%d, orderId=%s}".formatted(id, title, price, userId, version, orderId);
+        return withOrderId(null);
     }
 
     public boolean reserved() {
         return orderId != null;
+    }
+
+    public TicketCreatedMessage toTicketCreatedMessage() {
+        return new TicketCreatedMessage(id, title, userId, price, version);
+    }
+
+    public TicketUpdatedMessage toTicketUpdatedMessage() {
+        return new TicketUpdatedMessage(id, title, userId, price, version, orderId);
+    }
+
+    public TicketResponse toTicketResponse() {
+        return new TicketResponse(id, title, price, reserved());
     }
 }

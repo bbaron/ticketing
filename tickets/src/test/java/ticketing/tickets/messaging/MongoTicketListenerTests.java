@@ -12,6 +12,7 @@ import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
 import ticketing.tickets.messaging.publishers.TicketUpdatedMessage;
 import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -33,18 +34,18 @@ class MongoTicketListenerTests {
 
     @Test
     void when_ticket_is_created_ticket_created_event_is_emitted() {
-        var ticket = new Ticket(request, user);
+        var ticket = Ticket.of(request.getTitle(), request.getPrice(), user);
         repository.insert(ticket);
         verify(ticketCreatedPublisher).publish(any(TicketCreatedMessage.class));
     }
 
     @Test
     void when_ticket_is_updated_ticket_updated_event_is_emitted() {
-        var ticket = new Ticket(request, user);
+        var ticket = Ticket.of(request.getTitle(), request.getPrice(), user);
         ticket = repository.insert(ticket);
-        ticket = repository.findById(ticket.id)
-                           .orElseThrow();
-        ticket.setOrderId("asdf");
+        assertNotNull(ticket.getId());
+        ticket = repository.findById(ticket.getId())
+                           .orElseThrow().withOrderId("asdf");
         repository.save(ticket);
         verify(ticketUpdatedPublisher).publish(any(TicketUpdatedMessage.class));
     }

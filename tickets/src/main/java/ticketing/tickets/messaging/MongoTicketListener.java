@@ -20,15 +20,13 @@ public class MongoTicketListener extends AbstractOnInsertOrUpdateMongoEventListe
     public void onAfterInsert(AfterInsertEvent<Ticket> afterInsertEvent) {
         super.onAfterInsert(afterInsertEvent);
         Ticket ticket = afterInsertEvent.getSource();
-        var event = new TicketCreatedMessage(ticket.id, ticket.title, ticket.userId, ticket.price, ticket.version);
-        ticketPublisher.publish(event);
+        ticketPublisher.publish(ticket.toTicketCreatedMessage());
     }
 
     @Override
     public void onAfterUpdate(AfterUpdateEvent<Ticket> afterUpdateEvent) {
         super.onAfterUpdate(afterUpdateEvent);
         Ticket ticket = afterUpdateEvent.getSource();
-        var event = new TicketUpdatedMessage(ticket.id, ticket.title, ticket.userId, ticket.price, ticket.version, ticket.orderId);
-        ticketPublisher.publish(event);
+        ticketPublisher.publish(ticket.toTicketUpdatedMessage());
     }
 }
