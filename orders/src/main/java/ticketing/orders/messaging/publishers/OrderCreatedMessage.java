@@ -1,115 +1,25 @@
 package ticketing.orders.messaging.publishers;
 
+import lombok.Value;
 import ticketing.messaging.types.OrderStatus;
 
 import java.time.Instant;
 
+@Value
 public class OrderCreatedMessage {
-    public String id, userId;
-    public OrderStatus status;
-    public Instant expiresAt;
-    public Long version;
-    public Ticket ticket = new Ticket();
+    String id, userId;
+    OrderStatus status;
+    Instant expiresAt;
+    Long version;
+    Ticket ticket;
 
-    public OrderCreatedMessage() {
+    public static OrderCreatedMessage of(String id, String userId, OrderStatus status, Instant expiresAt, Long version, String ticketId, int price) {
+        return new OrderCreatedMessage(id, userId, status, expiresAt, version, new Ticket(ticketId, price));
     }
 
-    public OrderCreatedMessage(String id, String userId,
-                               Instant expiresAt, Long version, OrderStatus status,
-                               String ticketId, Integer ticketPrice) {
-        this.id = id;
-        this.userId = userId;
-        this.status = status;
-        this.expiresAt = expiresAt;
-        this.version = version;
-        this.ticket = new Ticket(ticketId, ticketPrice);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(Instant expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderCreatedEvent{id='%s', userId='%s', status=%s, expiresAt=%s, version=%d, ticket=%s}"
-                .formatted(id, userId, status, expiresAt, version, ticket);
-    }
-
+    @Value
     public static class Ticket {
-        public String id;
-        public Integer price;
-
-        public Ticket() {
-        }
-
-        public Ticket(String id, Integer price) {
-            this.id = id;
-            this.price = price;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public Integer getPrice() {
-            return price;
-        }
-
-        public void setPrice(Integer price) {
-            this.price = price;
-        }
-
-        @Override
-        public String toString() {
-            return "Ticket{id='%s', price=%d}".formatted(id, price);
-        }
+        String id;
+        Integer price;
     }
 }

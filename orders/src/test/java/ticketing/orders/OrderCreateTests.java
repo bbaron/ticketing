@@ -64,7 +64,8 @@ class OrderCreateTests {
     @DisplayName("errors if ticket not found")
     @WithMockUser
     void errors_if_ticket_not_found() throws Exception {
-        var ticketId = ObjectId.get().toHexString();
+        var ticketId = ObjectId.get()
+                               .toHexString();
         var content = """
                 {"ticketId": "%s"}
                 """.formatted(ticketId);
@@ -80,10 +81,9 @@ class OrderCreateTests {
     @DisplayName("errors if ticket is reserved")
     @WithMockUser
     void errors_if_ticket_is_reserved() throws Exception {
-        var ticket = new Ticket(null, "concert", 20);
-        ticket = ticketRepository.save(ticket);
+        var ticket = ticketRepository.save(Ticket.of(null, "concert", 20));
         var ticketId = ticket.getId();
-        var order = new Order("user", OrderStatus.Created, Instant.now(), ticket);
+        var order = Order.of("user", OrderStatus.Created, Instant.now(), ticket);
         orderRepository.save(order);
         // pop the order created message that was just emitted.
         messageIO.output.receive(0, "orderCreated");
@@ -104,8 +104,7 @@ class OrderCreateTests {
     @DisplayName("reserves a ticket")
     @WithMockUser
     void reserves_a_ticket() throws Exception {
-        var ticket = new Ticket(null, "concert", 20);
-        ticket = ticketRepository.save(ticket);
+        var ticket = ticketRepository.save(Ticket.of(null, "concert", 20));
 
         var content = """
                 {"ticketId": "%s"}
@@ -113,12 +112,12 @@ class OrderCreateTests {
         mvc.perform(post("/api/orders")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().isCreated());
+           .andDo(print())
+           .andExpect(status().isCreated());
 
-        var message = messageIO.output.receive(5,"orderCreated");
+        var message = messageIO.output.receive(5, "orderCreated");
         var payload = objectMapper.readValue(message.getPayload(), OrderCreatedMessage.class);
-        assertEquals(ticket.id, payload.ticket.id);
+        assertEquals(ticket.getId(), payload.getTicket().getId());
     }
 
 }

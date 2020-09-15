@@ -1,101 +1,34 @@
 package ticketing.orders;
 
+import lombok.Value;
 import ticketing.messaging.types.OrderStatus;
 
 import java.time.Instant;
 
+@Value
 public class OrderResponse {
-    private final String id;
-    private final Long version;
-    private final OrderStatus status;
-    private final String userId;
-    private final Instant expiresAt;
-    private final TicketResponse ticket;
+    String id;
+    Long version;
+    OrderStatus status;
+    String userId;
+    Instant expiresAt;
+    TicketResponse ticket;
 
-    public OrderResponse(String id, Long version, OrderStatus status, String userId, Instant expiresAt, TicketResponse ticket) {
-        this.id = id;
-        this.version = version;
-        this.status = status;
-        this.userId = userId;
-        this.expiresAt = expiresAt;
-        this.ticket = ticket;
-    }
 
-    public OrderResponse(Order order) {
-        this(order.getId(),
+    public static OrderResponse of(Order order) {
+        var ticket = order.getTicket();
+        return new OrderResponse(order.getId(),
                 order.getVersion(),
                 order.getStatus(),
                 order.getUserId(),
                 order.getExpiration(),
-                new TicketResponse(order.getTicket().getId(), order.getTicket().getTitle(), order.getTicket().getPrice()));
+                new TicketResponse(ticket.getId(), ticket.getTitle(), ticket.getPrice()));
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
-    }
-
-    public TicketResponse getTicket() {
-        return ticket;
-    }
-
+    @Value
     public static class TicketResponse {
-        private final String id;
-        private final String title;
-        private final Integer price;
-
-        public TicketResponse(String id, String title, Integer price) {
-            this.id = id;
-            this.title = title;
-            this.price = price;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public Integer getPrice() {
-            return price;
-        }
-
-        @Override
-        public String toString() {
-            return "TicketResponse{" +
-                    "id='" + id + '\'' +
-                    ", title='" + title + '\'' +
-                    ", price=" + price +
-                    '}';
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "OrderResponse{" +
-                "id='" + id + '\'' +
-                ", version=" + version +
-                ", status='" + status + '\'' +
-                ", userId='" + userId + '\'' +
-                ", expiresAt=" + expiresAt +
-                ", ticket=" + ticket +
-                '}';
+        String id;
+        String title;
+        Integer price;
     }
 }

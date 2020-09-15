@@ -1,25 +1,13 @@
 package ticketing.orders.messaging.listeners;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
+
+@Value
 public class ExpirationCompletedMessage {
-    public String orderId;
+    String orderId;
 
-    public ExpirationCompletedMessage() {
-    }
-
-    public ExpirationCompletedMessage(String orderId) {
+    public ExpirationCompletedMessage(@JsonProperty("orderId") String orderId) {
         this.orderId = orderId;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    @Override
-    public String toString() {
-        return "ExpirationCompletedEvent{orderId='%s'}".formatted(orderId);
     }
 }

@@ -41,7 +41,7 @@ public class TicketListenerTests {
         String id = ObjectId.get().toHexString();
         var title = "asdf";
         var price = 20;
-        var expected = new Ticket(id, title, price, 0L);
+        var expected = Ticket.of(id, title, price);
         var payload = """
                 {"id":"%s",
                 "title":"%s",
@@ -59,17 +59,17 @@ public class TicketListenerTests {
     void updates_and_saves_an_updated_ticket() {
         var title = "asdf";
         var price = 20;
-        var ticket = new Ticket(null, title, price);
-        ticketRepository.insert(ticket);
-        var expected = new Ticket(ticket.id, ticket.title.toUpperCase(),
-                ticket.price + 10, ticket.version + 1);
+        var ticket = ticketRepository.insert(Ticket.of(ObjectId.get()
+                                                               .toHexString(), title, price));
+        var expected = new Ticket(ticket.getId(), ticket.getTitle().toUpperCase(),
+                ticket.getPrice() + 10, ticket.getVersion() + 1, null);
         var payload = """
                 {"id":"%s",
                 "title":"%s",
                 "userId":"user",
                 "price":%s,
                 "version":%s}"""
-                .formatted(expected.id, expected.title, expected.price, expected.version);
+                .formatted(expected.getId(), expected.getTitle(), expected.getPrice(), expected.getVersion());
         var message = new GenericMessage<>(payload);
         messageIO.input.send(message, "ticketUpdated");
         assertTrue(ticketRepository.findOne(Example.of(expected)).isPresent(),
@@ -92,16 +92,15 @@ public class TicketListenerTests {
     }
 
     private void orderChangedTest(OrderStatus beforeStatus, OrderStatus afterStatus, String bindingName) {
-        var ticket = new Ticket(null, "title", 10);
-        ticketRepository.insert(ticket);
-        Order order = new Order("user", beforeStatus, Instant.now(), ticket);
-        orderRepository.insert(order);
+        var ticket = ticketRepository.insert(Ticket.of(null, "title", 10));
+        Order o = Order.of("user", beforeStatus, Instant.now(), ticket);
+        var order = orderRepository.insert(o);
         var payload = """
-                {"orderId": "%s"}""".formatted(order.id);
+                {"orderId": "%s"}""".formatted(order.getId());
         var message = new GenericMessage<>(payload);
         messageIO.input.send(message, bindingName);
-        order = orderRepository.findById(order.id).orElseThrow();
-        assertEquals(afterStatus, order.status);
+        order = orderRepository.findById(order.getId()).orElseThrow();
+        assertEquals(afterStatus, order.getStatus());
 
     }
 }

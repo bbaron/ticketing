@@ -21,36 +21,36 @@ public class MessageHandlers {
     private final OrderRepository orderRepository;
 
     void handleTicketCreated(TicketCreatedMessage message) {
-        Ticket ticket = new Ticket(message.id, message.title, message.price);
+        Ticket ticket = Ticket.of(message.getId(), message.getTitle(), message.getPrice());
         ticketRepository.save(ticket);
     }
 
     void handleTicketUpdated(TicketUpdatedMessage message) {
-        var example = new Ticket();
-        example.setId(message.id);
-        example.setVersion(message.version - 1);
+        var example = Ticket.builder()
+                            .id(message.getId())
+                            .version(message.getVersion() - 1)
+                            .build();
         Ticket ticket = ticketRepository.findOne(Example.of(example))
                                         .orElseThrow(() -> new IllegalStateException("ticket not found from " + message));
-        ticket.setTitle(message.title);
-        ticket.setPrice(message.price);
-        ticket.setOrderId(message.orderId);
-        ticketRepository.save(ticket);
+        var updated = ticket
+                .withTitle(message.getTitle())
+                .withPrice(message.getPrice())
+                .withOrderId(message.getOrderId());
+        ticketRepository.save(updated);
     }
 
     void handleExpirationCompleted(ExpirationCompletedMessage message) {
-        var order = orderRepository.findById(message.orderId)
+        var order = orderRepository.findById(message.getOrderId())
                                    .orElseThrow(() -> new IllegalStateException(message + " order not found"));
-        if (order.status != Completed) {
-            order.setStatus(Cancelled);
-            orderRepository.save(order);
+        if (order.getStatus() != Completed) {
+            orderRepository.save(order.withStatus(Cancelled));
         }
     }
 
     void handlePaymentCreated(PaymentCreatedMessage message) {
-        Order order = orderRepository.findById(message.orderId)
+        Order order = orderRepository.findById(message.getOrderId())
                                      .orElseThrow(() -> new IllegalStateException("Order not found " + message));
-        order.setStatus(Completed);
-        orderRepository.save(order);
+        orderRepository.save(order.withStatus(Completed));
     }
 
     @Bean

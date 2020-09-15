@@ -1,92 +1,46 @@
 package ticketing.orders;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ticketing.messaging.types.OrderStatus;
+import ticketing.orders.messaging.publishers.OrderCancelledMessage;
+import ticketing.orders.messaging.publishers.OrderCreatedMessage;
 
 import java.time.Instant;
 
 @Document
+@Value
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Builder
 public class Order {
     @Id
-    public String id;
-    public String userId;
-    public OrderStatus status;
-    public Instant expiration;
+    @With
+    String id;
+    @With
+    String userId;
+    @With
+    OrderStatus status;
+    Instant expiration;
     @Version
-    public Long version;
+    Long version;
     @DBRef
-    public Ticket ticket;
+    Ticket ticket;
 
-    public Order() {
+    public static Order of(String userId, OrderStatus status, Instant expiration, Ticket ticket) {
+        return new Order(null, userId, status, expiration, null, ticket);
     }
 
-    public Order(String userId, OrderStatus status, Instant expiration, Ticket ticket) {
-        this.userId = userId;
-        this.status = status;
-        this.expiration = expiration;
-        this.ticket = ticket;
+    public OrderCreatedMessage toOrderCreatedMessage() {
+        return OrderCreatedMessage.of(id, userId, status, expiration, version, ticket.getId(), ticket.getPrice());
     }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public Instant getExpiration() {
-        return expiration;
-    }
-
-    public void setExpiration(Instant expiration) {
-        this.expiration = expiration;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id='" + id + '\'' +
-                ", userId='" + userId + '\'' +
-                ", status=" + status +
-                ", expiration=" + expiration +
-                ", version=" + version +
-                ", ticket=" + ticket +
-                '}';
+    public OrderCancelledMessage toOrderCancelledMessage() {
+        return OrderCancelledMessage.of(id, version, ticket.getId());
     }
 }

@@ -1,77 +1,32 @@
 package ticketing.orders;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
+@Value
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
+@Builder
 public class Ticket {
     @Id
-    public String id;
-    public String title;
-    public Integer price;
+    @With
+    String id;
+    @With
+    String title;
+    @With
+    Integer price;
     @Version
-    public Long version;
-    public String orderId;
+    Long version;
+    @With
+    String orderId;
 
-    public Ticket() {
-    }
-
-    public Ticket(String id, String title, Integer price) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-    }
-
-    public Ticket(String id, String title, Integer price, Long version) {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.version = version;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    @Override
-    public String toString() {
-        return "Ticket{id=%s, title='%s', price=%s, version=%d, orderId=%s}".formatted(id, title, price, version, orderId);
+    public static Ticket of(String id, String title, int price) {
+        return new Ticket(id, title, price, null, null);
     }
 }

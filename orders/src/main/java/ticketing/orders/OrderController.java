@@ -45,7 +45,7 @@ public class OrderController {
     OrdersResponse findAll(Principal principal) {
         var orders = orderRepository.findByUserId(principal.getName())
                 .stream()
-                .map(OrderResponse::new)
+                .map(OrderResponse::of)
                 .collect(Collectors.toList());
         return new OrdersResponse(orders);
     }
@@ -57,10 +57,10 @@ public class OrderController {
             throw new ForbiddenException();
         }
         if (method.equals(HttpMethod.DELETE)) {
-            order.setStatus(OrderStatus.Cancelled);
+            order = order.withStatus(OrderStatus.Cancelled);
             orderRepository.save(order);
         }
-        return new OrderResponse(order);
+        return OrderResponse.of(order);
     }
 
     @PostMapping
@@ -71,7 +71,7 @@ public class OrderController {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
-        var ticket = ticketRepository.findById(orderRequest.ticketId()).orElseThrow(NotFoundException::new);
+        var ticket = ticketRepository.findById(orderRequest.getTicketId()).orElseThrow(NotFoundException::new);
         boolean reserved = orderRepository.findByTicket(ticket)
                 .stream()
                 .anyMatch(o -> o.getStatus().isReserved());
@@ -85,10 +85,10 @@ public class OrderController {
         var expiration = Instant.now().plusSeconds(seconds);
         logger.info("expiration: " + expiration);
         var userId = principal.getName();
-        var order = new Order(userId, OrderStatus.Created, expiration, ticket);
+        var order = Order.of(userId, OrderStatus.Created, expiration, ticket);
         order = orderRepository.insert(order);
         logger.info("Saved " + order);
 
-        return status(CREATED).body(new OrderResponse(order));
+        return status(CREATED).body(OrderResponse.of(order));
     }
 }

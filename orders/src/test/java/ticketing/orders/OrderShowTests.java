@@ -30,7 +30,7 @@ class OrderShowTests {
     ObjectMapper objectMapper;
 
     private Ticket buildTicket() {
-        var ticket = new Ticket(null, "concert", 20);
+        var ticket = Ticket.of(null, "concert", 20);
         return ticketRepository.save(ticket);
     }
 

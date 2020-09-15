@@ -1,18 +1,19 @@
 package ticketing.orders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 import ticketing.common.validation.MongoId;
 
 import javax.validation.constraints.NotNull;
 
-@SuppressWarnings("unused")
-public record OrderRequest(
-        @JsonProperty("ticketId")
-        @NotNull
-        @MongoId
-        String ticketId
-) {
-    public String getTicketId() {
-        return ticketId;
+@Value
+public class OrderRequest {
+    @NotNull
+    @MongoId
+    String ticketId;
+
+    public OrderRequest(@JsonProperty("ticketId") String ticketId) {
+        this.ticketId = ticketId;
     }
+
 }

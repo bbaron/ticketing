@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ticketing.orders.Order;
+import ticketing.orders.Order.OrderBuilder;
 import ticketing.orders.OrderRepository;
 import ticketing.orders.Ticket;
 import ticketing.orders.TicketRepository;
@@ -24,8 +25,7 @@ class MongoOrderListenerTests {
     OrderCreatedPublisher orderCreatedPublisher;
     @MockBean
     OrderCancelledPublisher orderCancelledPublisher;
-    final Order order = new Order();
-    final Ticket ticket = new Ticket();
+    final OrderBuilder order = Order.builder();
 
     @Autowired
     MongoOrderListenerTests(OrderRepository orderRepository, TicketRepository ticketRepository) {
@@ -35,17 +35,18 @@ class MongoOrderListenerTests {
 
     @BeforeEach
     void setUp() {
-        ticket.setPrice(10);
-        ticket.setTitle("event");
-        ticketRepository.insert(ticket);
-        order.setTicket(ticket);
-        order.setStatus(Created);
+        var ticket = Ticket.builder();
+        var saved = ticketRepository.insert(ticket.price(10)
+                                                  .title("event")
+                                                  .build());
+        order.ticket(saved)
+             .status(Created);
     }
 
     @Test
     @DisplayName("when order is created, emit order created event")
     void test1() {
-        orderRepository.insert(order);
+        orderRepository.insert(order.build());
         verify(orderCreatedPublisher).publish(any());
         verify(orderCancelledPublisher, never()).publish(any());
     }
@@ -53,10 +54,9 @@ class MongoOrderListenerTests {
     @Test
     @DisplayName("when order is updated and status is cancelled, emit order cancelled event")
     void test2() {
-        orderRepository.insert(order);
+        var inserted = orderRepository.insert(order.build());
         reset(orderCreatedPublisher);
-        order.setStatus(Cancelled);
-        orderRepository.save(order);
+        orderRepository.save(inserted.withStatus(Cancelled));
         verify(orderCancelledPublisher).publish(any());
         verify(orderCreatedPublisher, never()).publish(any());
     }
@@ -64,10 +64,9 @@ class MongoOrderListenerTests {
     @Test
     @DisplayName("when order is updated and status is not cancelled, order cancelled is not emitted")
     void test3() {
-        orderRepository.insert(order);
+        var inserted = orderRepository.insert(order.build());
         reset(orderCreatedPublisher);
-        order.setStatus(AwaitingPayment);
-        orderRepository.save(order);
+        orderRepository.save(inserted.withStatus(AwaitingPayment));
         verify(orderCancelledPublisher, never()).publish(any());
         verify(orderCreatedPublisher, never()).publish(any());
     }

@@ -1,69 +1,24 @@
 package ticketing.orders.messaging.publishers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
+
+@Value
 public class OrderCancelledMessage {
-    public String id;
-    public Long version;
-    public Ticket ticket = new Ticket();
+    String id;
+    Long version;
+    Ticket ticket;
 
-    public OrderCancelledMessage() {
+    public static OrderCancelledMessage of(String id, Long version, String ticketId) {
+        return new OrderCancelledMessage(id, version, new Ticket(ticketId));
     }
 
-    public OrderCancelledMessage(String id, Long version, String ticketId) {
-        this.id = id;
-        this.version = version;
-        this.ticket = new Ticket(ticketId);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderCancelledEvent{id='%s', version=%d, ticket=%s}".formatted(id, version, ticket);
-    }
-
+    @Value
     public static class Ticket {
-        public String id;
+        String id;
 
-        public Ticket() {
-        }
-
-        public Ticket(String id) {
+        public Ticket(@JsonProperty("id") String id) {
             this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public String toString() {
-            return "Ticket{id='%s'}".formatted(id);
         }
     }
 }
