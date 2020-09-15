@@ -42,7 +42,7 @@ public class AuthController {
     @ResponseStatus(CREATED)
     public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpServletResponse response) {
         if (!bindingResult.hasFieldErrors("email")) {
-            if (userRepository.existsByEmail(userRequest.email())) {
+            if (userRepository.existsByEmail(userRequest.getEmail())) {
                 bindingResult.rejectValue("email", "duplicate-email", "Email in use");
             }
         }
@@ -64,11 +64,11 @@ public class AuthController {
             throw new RequestValidationException(bindingResult);
         }
 
-        var user = userRepository.findByEmail(userRequest.email());
+        var user = userRepository.findByEmail(userRequest.getEmail());
         if (user == null) {
             throw new BadCredentialsException();
         }
-        if (!passwordEncoder.matches(userRequest.password(), user.password())) {
+        if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
             throw new BadCredentialsException();
         }
         var userResponse =  userResponse(user, response);
@@ -92,7 +92,7 @@ public class AuthController {
     }
 
     private UserResponse userResponse(User user, HttpServletResponse response) {
-        String jwt = jwtUtils.generateJwt(user.id(), user.email());
+        String jwt = jwtUtils.generateJwt(user.getId(), user.getEmail());
         response.addHeader(ticketingProperties.security.authHeaderName, jwt);
         var currentUserResponse = jwtUtils.verifyJwt(jwt);
         return new UserResponse(jwt, currentUserResponse.getCurrentUser());

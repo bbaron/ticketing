@@ -123,7 +123,7 @@ class CreatePaymentTests {
                 .content(content))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        var payment = new Payment(order.getId(), stripeCharge.chargeId);
+        var payment = Payment.of(order.getId(), stripeCharge.chargeId);
         assertTrue(paymentRepository.findOne(Example.of(payment)).isPresent());
         var message = messageIO.output.receive(5,"paymentCreated");
         var payload = objectMapper.readValue(message.getPayload(), PaymentCreatedMessage.class);

@@ -1,15 +1,18 @@
 package ticketing.payments;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ticketing.messaging.types.OrderStatus;
 
 @Document
 @Value
+@AllArgsConstructor(onConstructor = @__(@PersistenceConstructor))
 @Builder
 public class Order {
     @Id

@@ -50,9 +50,9 @@ public class PaymentsController {
             throw new BadRequestException("order is cancelled");
         }
         var stripeCharge = paymentService.createCharge(paymentRequest, order);
-        var payment = new Payment( order.getId(), stripeCharge.chargeId);
+        var payment = Payment.of( order.getId(), stripeCharge.chargeId);
         payment = paymentRepository.insert(payment);
-        return status(CREATED).body(new PaymentResponse(payment.id));
+        return status(CREATED).body(new PaymentResponse(payment.getId()));
     }
 
 }

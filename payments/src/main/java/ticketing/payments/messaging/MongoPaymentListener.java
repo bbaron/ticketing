@@ -21,7 +21,7 @@ public class MongoPaymentListener extends AbstractOnInsertOrUpdateMongoEventList
     public void onAfterInsert(AfterInsertEvent<Payment> afterInsertEvent) {
         super.onAfterInsert(afterInsertEvent);
         var payment = afterInsertEvent.getSource();
-        var event = new PaymentCreatedMessage(payment.id, payment.orderId, payment.stripeId);
+        var event = new PaymentCreatedMessage(payment.getId(), payment.getOrderId(), payment.getStripeId());
         paymentCreatedPublisher.publish(event);
     }
 }
