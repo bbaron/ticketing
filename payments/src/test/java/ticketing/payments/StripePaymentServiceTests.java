@@ -25,13 +25,15 @@ class StripePaymentServiceTests {
     void can_submit_charge() throws StripeException {
         int price = new Random().nextInt(100_000);
         var options = RequestOptions.builder()
-                .setApiKey(STRIPE_KEY)
-                .build();
+                                    .setApiKey(STRIPE_KEY)
+                                    .build();
         var service = new StripePaymentService(options);
-        Order order = new Order();
-        order.setId(ObjectId.get().toHexString());
-        order.setPrice(price);
-         PaymentRequest paymentRequest = new PaymentRequest("tok_visa", order.id);
+        Order order = Order.builder()
+                           .id(ObjectId.get()
+                                       .toHexString())
+                           .price(price)
+                           .build();
+        PaymentRequest paymentRequest = new PaymentRequest("tok_visa", order.getId());
         var stripeCharge = service.createCharge(paymentRequest, order);
         assertNotNull(stripeCharge.chargeId);
         var charge = Charge.retrieve(stripeCharge.chargeId, options);

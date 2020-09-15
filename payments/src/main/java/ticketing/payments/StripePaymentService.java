@@ -34,11 +34,11 @@ public class StripePaymentService implements PaymentService {
 
     @Override
     public StripeCharge createCharge(PaymentRequest paymentRequest, Order order) {
-        int amount = order.price * 100;
+        int amount = order.getPrice() * 100;
         Map<String, Object> params = Map.of(
                 "amount", amount,
                 "currency", "usd",
-                "source", paymentRequest.token()
+                "source", paymentRequest.getToken()
         );
         logger.info("creating stripe charge: " + params);
         try {

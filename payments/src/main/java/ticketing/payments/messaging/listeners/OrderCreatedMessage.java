@@ -1,65 +1,21 @@
 package ticketing.payments.messaging.listeners;
 
-import ticketing.common.events.Event;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 import ticketing.messaging.types.OrderStatus;
 
+@Value
 public class OrderCreatedMessage {
-    public String id, userId;
-    public OrderStatus status;
-    public Ticket ticket = new Ticket();
+    String id, userId;
+    OrderStatus status;
+    Ticket ticket;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
-    }
-
-
-    @Override
-    public String toString() {
-        return "OrderCreatedEvent{id='%s', userId='%s', status=%s, ticket=%s}".formatted(id, userId, status, ticket);
-    }
-
+    @Value
     public static class Ticket {
-        public Integer price;
+       Integer price;
 
-        public Integer getPrice() {
-            return price;
-        }
-
-        public void setPrice(Integer price) {
-            this.price = price;
-        }
-
-        @Override
-        public String toString() {
-            return "Ticket{price=%d}".formatted(price);
-        }
+       public Ticket(@JsonProperty("price") Integer price) {
+           this.price = price;
+       }
     }
 }

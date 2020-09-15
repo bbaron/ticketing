@@ -37,15 +37,23 @@ public class OrderListenerTests {
 
     @Test
     void creates_and_saves_an_order() {
-        String orderId = ObjectId.get().toHexString();
-        String ticketId = ObjectId.get().toHexString();
+        String orderId = ObjectId.get()
+                                 .toHexString();
+        String ticketId = ObjectId.get()
+                                  .toHexString();
         Instant expiresAt = Instant.now();
         OrderStatus status = Created;
         Integer price = 20;
-        String userId = ObjectId.get().toHexString();
+        String userId = ObjectId.get()
+                                .toHexString();
         Long version = 0L;
-        var expected = new Order(orderId, status, price, userId);
-        expected.version = version;
+        var expected = Order.builder()
+                            .id(orderId)
+                            .price(price)
+                            .status(status)
+                            .version(version)
+                            .userId(userId)
+                            .build();
 
         var payload = """
                 {"id":"%s",
@@ -57,33 +65,42 @@ public class OrderListenerTests {
                 .formatted(orderId, status, userId, expiresAt, version, ticketId, price);
         var message = new GenericMessage<>(payload);
         messageIO.input.send(message, "orderCreated");
-        orderRepository.findOne(Example.of(expected)).ifPresentOrElse(
-                order -> assertThat(order, samePropertyValuesAs(expected)),
-                () -> fail("order was not saved in event listener"));
+        orderRepository.findOne(Example.of(expected))
+                       .ifPresentOrElse(
+                               order -> assertThat(order, samePropertyValuesAs(expected)),
+                               () -> fail("order was not saved in event listener"));
 
     }
 
     @Test
     void cancels_and_saves_order() {
-        String orderId = ObjectId.get().toHexString();
-        Integer price = 20;
-        String userId = ObjectId.get().toHexString();
+        String orderId = ObjectId.get()
+                                 .toHexString();
+        int price = 20;
+        String userId = ObjectId.get()
+                                .toHexString();
         Long version = 1L;
 
-        var newOrder = new Order(orderId, Created, price, userId);
+        var newOrder = Order.of(orderId, Created, price, userId);
         orderRepository.save(newOrder);
 
-        var expected = new Order(orderId, Cancelled, price, userId);
-        expected.version = version;
+        var expected = Order.builder()
+                            .id(orderId)
+                            .price(price)
+                            .status(Cancelled)
+                            .version(version)
+                            .userId(userId)
+                            .build();
         var payload = """
                 {"id":"%s",
                 "version":%s}"""
                 .formatted(orderId, version);
         var message = new GenericMessage<>(payload);
         messageIO.input.send(message, "orderCancelled");
-        orderRepository.findOne(Example.of(expected)).ifPresentOrElse(
-                order -> assertThat(order, samePropertyValuesAs(expected)),
-                () -> fail("order was not saved in event listener"));
+        orderRepository.findOne(Example.of(expected))
+                       .ifPresentOrElse(
+                               order -> assertThat(order, samePropertyValuesAs(expected)),
+                               () -> fail("order was not saved in event listener"));
 
     }
 }

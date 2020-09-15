@@ -41,16 +41,16 @@ public class PaymentsController {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
-        var order = orderRepository.findById(paymentRequest.orderId())
+        var order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(NotFoundException::new);
-        if (!Objects.equals(order.userId, principal.getName())) {
+        if (!Objects.equals(order.getUserId(), principal.getName())) {
             throw new ForbiddenException();
         }
-        if (order.status.isCancelled()) {
+        if (order.getStatus().isCancelled()) {
             throw new BadRequestException("order is cancelled");
         }
         var stripeCharge = paymentService.createCharge(paymentRequest, order);
-        var payment = new Payment( order.id, stripeCharge.chargeId);
+        var payment = new Payment( order.getId(), stripeCharge.chargeId);
         payment = paymentRepository.insert(payment);
         return status(CREATED).body(new PaymentResponse(payment.id));
     }

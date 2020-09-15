@@ -21,19 +21,20 @@ public class MessageHandlers {
 
     void handleOrderCreated(OrderCreatedMessage message) {
         logger.info("Received {}", message);
-        var order = new Order(message.id, message.status, message.ticket.price, message.userId);
+        var order = Order.of(message.getId(), message.getStatus(), message.getTicket().getPrice(), message.getUserId());
         orderRepository.save(order);
     }
 
     void handleOrderCancelled(OrderCancelledMessage message) {
         logger.info("Received {}", message);
-        Order orderExample = new Order();
-        orderExample.setVersion(message.version - 1);
-        orderExample.setId(message.id);
+        Order orderExample = Order.builder()
+                                  .version(message.getVersion() - 1)
+                                  .id(message.getId())
+                                  .build();
         Example<Order> example = Example.of(orderExample);
         Order order = orderRepository.findOne(example)
-                                     .orElseThrow(() -> new IllegalStateException("%s: No such order".formatted(message)));
-        order.setStatus(Cancelled);
+                                     .orElseThrow(() -> new IllegalStateException("%s: No such order".formatted(message)))
+                                     .withStatus(Cancelled);
         orderRepository.save(order);
     }
 
