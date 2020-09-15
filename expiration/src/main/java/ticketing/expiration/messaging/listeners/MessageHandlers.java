@@ -17,7 +17,7 @@ public class MessageHandlers {
 
     void handleOrderCreated(OrderCreatedMessage message) {
         logger.info("publishing {} to redisDelayQueue", message);
-        redisDelayedQueue.offerDelayedSeconds(message.id, message.calculateDelayInSeconds());
+        redisDelayedQueue.offerDelayedSeconds(message.getId(), message.calculateDelayInSeconds());
     }
 
     @Bean
