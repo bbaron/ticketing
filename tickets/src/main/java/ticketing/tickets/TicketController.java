@@ -33,7 +33,7 @@ public class TicketController {
     TicketsResponse findAll() {
 
         var tickets = ticketRepository
-                .findByOrderIdIsNotNull()
+                .findByOrderIdIsNull()
                 .stream()
                 .map(Ticket::toTicketResponse)
                 .collect(toList());

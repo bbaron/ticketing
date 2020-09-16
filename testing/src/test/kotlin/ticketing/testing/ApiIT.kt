@@ -6,6 +6,7 @@ import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import java.lang.Thread.sleep
+import kotlin.random.Random
 
 @TestMethodOrder(OrderAnnotation::class)
 class ApiIT {
@@ -24,7 +25,7 @@ class ApiIT {
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     @DisplayName("currentuser with no auth info returns null user")
     internal fun `currentuser with no auth info returns null user`() {
         val response = api.getCurrentUser().execute()
@@ -34,16 +35,26 @@ class ApiIT {
     }
 
     @Test
-    @Order(2)
+    @Order(20)
     @DisplayName("get all tickets does not require auth")
     internal fun `get all tickets does not require auth`() {
         val response = api.getTickets().execute()
         assertThat(response.isSuccessful).isTrue()
-        println(response.body())
     }
 
     @Test
-    @Order(3)
+    @Order(24)
+    @DisplayName("get all tickets are all available")
+    internal fun `get all tickets are all available`() {
+        val response = api.getTickets().execute()
+        assertThat(response.isSuccessful).isTrue()
+        val tickets = response.body()?.tickets ?: fail("GET tickets failed")
+        assertThat(tickets).noneMatch { it.reserved }
+
+    }
+
+    @Test
+    @Order(30)
     @DisplayName("unregistered user denied signin")
     internal fun `unregistered user denied signin`() {
         val user = randomUser()
@@ -52,7 +63,7 @@ class ApiIT {
     }
 
     @Test
-    @Order(4)
+    @Order(40)
     @DisplayName("random user may signup")
     internal fun `random user may signup`() {
         val response = api.signup(userRequest).execute()
@@ -86,7 +97,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(1)
+        @Order(10)
         @DisplayName("signin is successful")
         internal fun `signin is successful`() {
             val response = api.signin(userRequest).execute()
@@ -100,7 +111,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(2)
+        @Order(20)
         @DisplayName("create new ticket is successful")
         internal fun `create new ticket is successful`() {
             val ticketRequest = randomTicketRequest()
@@ -114,7 +125,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(3)
+        @Order(30)
         @DisplayName("may get the ticket")
         internal fun `may get the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
@@ -125,7 +136,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(4)
+        @Order(40)
         @DisplayName("may update the ticket")
         internal fun `may update the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
@@ -138,7 +149,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(5)
+        @Order(50)
         @DisplayName("another user MAY NOT update the ticket")
         internal fun `another user MAY NOT update the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
@@ -148,7 +159,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(6)
+        @Order(60)
         @DisplayName("create new order is successful")
         internal fun `create new order is successful`() {
             val ticket = createTicket(ticketSeller)
@@ -166,7 +177,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(7)
+        @Order(70)
         @DisplayName("may get the order")
         internal fun `may get the order`() {
             assumeThat(this::orderResponse.isInitialized).isTrue()
@@ -177,7 +188,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(8)
+        @Order(80)
         @DisplayName("another user MAY NOT get the order")
         internal fun `another user MAY NOT get the order`() {
             assumeThat(this::orderResponse.isInitialized).isTrue()
@@ -186,7 +197,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(9)
+        @Order(90)
         @DisplayName("may cancel the order")
         internal fun `may cancel the order`() {
             val order = createOrder(createTicket(ticketSeller), ticketBuyer)
@@ -198,7 +209,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(10)
+        @Order(100)
         @DisplayName("another user MAY NOT cancel the order")
         internal fun `another user MAY NOT cancel the order`() {
             val order = createOrder(createTicket(ticketSeller), ticketBuyer)
@@ -207,7 +218,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(11)
+        @Order(110)
         @DisplayName("may get own orders only")
         internal fun `may get own orders only`() {
             val user = signupRandomUser()
@@ -224,7 +235,7 @@ class ApiIT {
         }
 
         @Test
-        @Order(12)
+        @Order(120)
         @DisplayName("may not order ticket already reserved")
         internal fun `may not order ticket already reserved`() {
             val ticket = createTicket(ticketSeller)
@@ -234,12 +245,14 @@ class ApiIT {
         }
 
         @Test
-        @Order(13)
+        @Order(130)
         @DisplayName("order and wait for it to expire")
         internal fun `order and wait for it to expire`() {
             val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
+            val millis = 2000L
             println("waiting for order $orderId to expire")
-            sleep(2000)
+            sleep(millis)
+            println("waited $millis millis for order $orderId to expire")
             val order = api.getOrder(orderId, ticketBuyer.jwt)
                     .execute()
                     .body()!!
@@ -247,7 +260,25 @@ class ApiIT {
         }
 
         @Test
-        @Order(14)
+        @Order(135)
+        @DisplayName("order a random ticket from the landing page")
+        internal fun `order a random ticket from the landing page`() {
+
+            val tickets = api.getTickets().execute().body()?.tickets ?: fail("GET tickets failed")
+            val ticket = tickets[Random.nextInt(tickets.size)]
+            val orderId = createOrder(ticket, ticketBuyer, "1").id
+            val millis = 2000L
+            println("waiting for order $orderId to expire")
+            sleep(millis)
+            println("waited $millis millis for order $orderId to expire")
+            val order = api.getOrder(orderId, ticketBuyer.jwt)
+                    .execute()
+                    .body()!!
+            assertThat(order.status).isEqualTo("Cancelled")
+        }
+
+        @Test
+        @Order(140)
         @DisplayName("make payment on order")
         internal fun `make payment on order`() {
             val paymentApi = Api.create("http://localhost:8080")
