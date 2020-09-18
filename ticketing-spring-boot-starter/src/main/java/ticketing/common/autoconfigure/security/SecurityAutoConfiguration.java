@@ -18,73 +18,73 @@ import ticketing.common.jwt.JwtUtils;
 
 import java.util.Optional;
 
-@EnableWebSecurity
-@Configuration
-@ConditionalOnClass(WebSecurityConfigurerAdapter.class)
-@ConditionalOnProperty(prefix = "ticketing.security", value = "enabled", havingValue = "true", matchIfMissing = true)
-@Order(1)
+//@EnableWebSecurity
+//@Configuration
+//@ConditionalOnClass(WebSecurityConfigurerAdapter.class)
+//@ConditionalOnProperty(prefix = "ticketing.security", value = "enabled", havingValue = "true", matchIfMissing = true)
+//@Order(1)
 public class SecurityAutoConfiguration extends WebSecurityConfigurerAdapter {
-    private final HttpSecurityCustomizer httpSecurityCustomizer;
-    private final TicketingProperties ticketingProperties;
-
-    public SecurityAutoConfiguration(TicketingProperties ticketingProperties,
-                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer) {
-        this.httpSecurityCustomizer = httpSecurityCustomizer.orElse(null);
-        this.ticketingProperties = ticketingProperties;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(preAuthenticatedAuthenticationProvider());
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.addFilter(requestHeaderAuthenticationFilter())
-                .csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
-
-        if (httpSecurityCustomizer != null) {
-            httpSecurityCustomizer.customize(http);
-        }
-    }
-
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
-        var filter = new RequestHeaderAuthenticationFilter();
-        filter.setPrincipalRequestHeader(ticketingProperties.getSecurity().getAuthHeaderName());
-        filter.setExceptionIfHeaderMissing(false);
-        filter.setContinueFilterChainOnUnsuccessfulAuthentication(true);
-        filter.setAuthenticationDetailsSource(customAuthenticationDetailsSource());
-        filter.setAuthenticationManager(authenticationManager());
-        return filter;
-    }
-
-    @Bean
-    public PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider() {
-        var provider = new PreAuthenticatedAuthenticationProvider();
-        provider.setPreAuthenticatedUserDetailsService(customUserDetailsService());
-        return provider;
-    }
-
-    @Bean
-    public CustomAuthenticationDetailsSource customAuthenticationDetailsSource() {
-        return new CustomAuthenticationDetailsSource();
-    }
-
-    @Bean
-    public CustomUserDetailsService customUserDetailsService() {
-        return new CustomUserDetailsService(jwtUtils());
-    }
-
-    @Bean
-    public JwtUtils jwtUtils() {
-        return new JwtUtils(ticketingProperties);
-    }
+//    private final HttpSecurityCustomizer httpSecurityCustomizer;
+//    private final TicketingProperties ticketingProperties;
+//
+//    public SecurityAutoConfiguration(TicketingProperties ticketingProperties,
+//                                     Optional<HttpSecurityCustomizer> httpSecurityCustomizer) {
+//        this.httpSecurityCustomizer = httpSecurityCustomizer.orElse(null);
+//        this.ticketingProperties = ticketingProperties;
+//    }
+//
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) {
+//        auth.authenticationProvider(preAuthenticatedAuthenticationProvider());
+//    }
+//
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.addFilter(requestHeaderAuthenticationFilter())
+//                .csrf().disable()
+//                .exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint());
+//
+//        if (httpSecurityCustomizer != null) {
+//            httpSecurityCustomizer.customize(http);
+//        }
+//    }
+//
+//    @Override
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
+//
+//    @Bean
+//    public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
+//        var filter = new RequestHeaderAuthenticationFilter();
+//        filter.setPrincipalRequestHeader(ticketingProperties.getSecurity().getAuthHeaderName());
+//        filter.setExceptionIfHeaderMissing(false);
+//        filter.setContinueFilterChainOnUnsuccessfulAuthentication(true);
+//        filter.setAuthenticationDetailsSource(customAuthenticationDetailsSource());
+//        filter.setAuthenticationManager(authenticationManager());
+//        return filter;
+//    }
+//
+//    @Bean
+//    public PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider() {
+//        var provider = new PreAuthenticatedAuthenticationProvider();
+//        provider.setPreAuthenticatedUserDetailsService(customUserDetailsService());
+//        return provider;
+//    }
+//
+//    @Bean
+//    public CustomAuthenticationDetailsSource customAuthenticationDetailsSource() {
+//        return new CustomAuthenticationDetailsSource();
+//    }
+//
+//    @Bean
+//    public CustomUserDetailsService customUserDetailsService() {
+//        return new CustomUserDetailsService(jwtUtils());
+//    }
+//
+//    @Bean
+//    public JwtUtils jwtUtils() {
+//        return new JwtUtils(ticketingProperties);
+//    }
 }

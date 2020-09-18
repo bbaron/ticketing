@@ -11,18 +11,21 @@ JQ='jq -r'
 # signin
 auth_url='/api/users/signin'
 auth_header=''
-jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
-if [[ "$jwt" == 'null' ]]; then
-  echo "POST $auth_url failed, trying signup"
+#jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
+#if [[ "$jwt" == 'null' ]]; then
+#  echo "POST $auth_url failed, trying signup"
   auth_url='/api/users/signup'
-  jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
-  if [[ "$jwt" == 'null' ]]; then
-    echo "POST $auth_url failed"
-    exit 1
-  fi
-fi
-auth_header="x-auth-info:$jwt"
-echo "signed in jwt = $jwt"
+  port=8083
+#  jwt=$($HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf' | $JQ .jwt)
+  $HTTP POST ":${port}${auth_url}" "$content_type" "email=$email" 'password=asdf'
+#  if [[ "$jwt" == 'null' ]]; then
+#    echo "POST $auth_url failed"
+#    exit 1
+#  fi
+#fi
+#auth_header="x-auth-info:$jwt"
+#echo "signed in jwt = $jwt"
+exit 0
 $HTTP ":$port/api/users/currentuser" "$auth_header"
 
 # create ticket

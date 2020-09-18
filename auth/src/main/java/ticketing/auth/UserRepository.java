@@ -2,9 +2,11 @@ package ticketing.auth;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends MongoRepository<User, String> {
+import java.util.Optional;
+
+public interface UserRepository extends MongoRepository<AppUser, String> {
     boolean existsByEmail(String email);
 
-    User findByEmail(String email);
+    Optional<AppUser> findByEmail(String email);
 
 }

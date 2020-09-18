@@ -9,7 +9,7 @@ import ticketing.common.autoconfigure.security.SecurityAutoConfiguration;
 import ticketing.common.autoconfigure.web.WebAutoConfiguration;
 
 @Configuration
-@Import({SecurityAutoConfiguration.class, WebAutoConfiguration.class, EventsAutoConfiguration.class, JsonAutoConfiguration.class})
+@Import({WebAutoConfiguration.class, EventsAutoConfiguration.class, JsonAutoConfiguration.class})
 @EnableConfigurationProperties(TicketingProperties.class)
 public class TicketingAutoConfiguration {
 }

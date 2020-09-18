@@ -57,6 +57,24 @@ public class TicketingProperties {
         public String authHeaderName = "x-auth-info";
         public String authSensitiveHeaderName = "x-auth-info-sensitive";
         public String jwtKey;
+        public String clientId = "client";
+        public String clientSecret = "{bcrypt}$2a$10$pdfbrvFYA.GRpPV4D0AfROayqhiDUs4aBLuoKLNRKf3VzI/l6Yks.";
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
+        }
+
+        public String getClientSecret() {
+            return clientSecret;
+        }
+
+        public void setClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
 
         public String getJwtKey() {
             return jwtKey;

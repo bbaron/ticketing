@@ -28,7 +28,7 @@ public class CurrentUserResponse {
         private final String id, email;
         private final Date iat;
 
-        CurrentUser(String id, String email, Date iat) {
+        public CurrentUser(String id, String email, Date iat) {
             this.id = id;
             this.email = email;
             this.iat = iat;
