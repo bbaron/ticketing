@@ -1,8 +1,6 @@
-package ticketing.auth;
+package ticketing.common.autoconfigure.security;
 
 import lombok.Value;
-
-import java.time.Instant;
 
 @Value
 public class CurrentUser {

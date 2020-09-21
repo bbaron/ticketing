@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+@Deprecated
 public class JwtUtils {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final Key key;
@@ -59,7 +60,6 @@ public class JwtUtils {
         }
     }
 
-    @SuppressWarnings("unused")
     public CurrentUserResponse getCurrentUser(HttpServletRequest request) {
         return getJwtCookie(request)
                 .map(Cookie::getValue)

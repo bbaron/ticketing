@@ -59,6 +59,15 @@ public class TicketingProperties {
         public String jwtKey;
         public String clientId = "client";
         public String clientSecret = "{bcrypt}$2a$10$pdfbrvFYA.GRpPV4D0AfROayqhiDUs4aBLuoKLNRKf3VzI/l6Yks.";
+        public int accessTokenValiditySeconds = 43_200;
+
+        public int getAccessTokenValiditySeconds() {
+            return accessTokenValiditySeconds;
+        }
+
+        public void setAccessTokenValiditySeconds(int accessTokenValiditySeconds) {
+            this.accessTokenValiditySeconds = accessTokenValiditySeconds;
+        }
 
         public String getClientId() {
             return clientId;

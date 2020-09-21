@@ -1,43 +1,32 @@
 package ticketing.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ticketing.common.autoconfigure.TicketingProperties;
-import ticketing.common.autoconfigure.security.CustomUserDetails;
+import ticketing.common.autoconfigure.security.CurrentUser;
 import ticketing.common.exceptions.RequestValidationException;
-import ticketing.common.jwt.CurrentUserResponse;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import java.util.Date;
+import java.time.Instant;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping(path = {"/api/users", "/", ""})
+@RequiredArgsConstructor
 public class AuthController {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TicketingProperties ticketingProperties;
-
-    public AuthController(UserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
-                          TicketingProperties ticketingProperties) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.ticketingProperties = ticketingProperties;
-    }
 
     @PostMapping(path = "/signup")
     @ResponseStatus(CREATED)
-    public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult, HttpServletResponse response) {
+    public UserResponse signup(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult) {
         if (!bindingResult.hasFieldErrors("email")) {
             if (userRepository.existsByEmail(userRequest.getEmail())) {
                 bindingResult.rejectValue("email", "duplicate-email", "Email in use");
@@ -48,51 +37,19 @@ public class AuthController {
         }
         var user = userRequest.toUser(passwordEncoder);
         user = userRepository.insert(user);
-        var userResponse =  userResponse(user, response);
+        var userResponse =  userResponse(user);
         logger.info("signed up " + userResponse);
         return userResponse;
-    }
-
-//    @PostMapping(path = "/signin")
-//    @ResponseStatus(OK)
-//    public UserResponse signin(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult,
-//                               HttpServletResponse response) {
-//        if (bindingResult.hasErrors()) {
-//            throw new RequestValidationException(bindingResult);
-//        }
-//
-//        var user = userRepository.findByEmail(userRequest.getEmail());
-//        if (user == null) {
-//            throw new BadCredentialsException();
-//        }
-//        if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
-//            throw new BadCredentialsException();
-//        }
-//        var userResponse =  userResponse(user, response);
-//        logger.info("signed in " + userResponse);
-//        return userResponse;
-//    }
-
-    @GetMapping(path = "/currentuser")
-    public CurrentUserResponse currentUser(@AuthenticationPrincipal CustomUserDetails user) {
-        if (user == null) {
-            return CurrentUserResponse.NONE;
-        }
-        return user.toCurrentUserResponse();
     }
 
     @RequestMapping(path = "/signout")
     @ResponseStatus(OK)
     public void signout(HttpServletResponse response) {
         logger.info("Signing out current user, response: " + response);
-//        response.addHeader(ticketingProperties.security.authHeaderName, "SIGNED_OUT");
     }
 
-    private UserResponse userResponse(AppUser user, HttpServletResponse response) {
-//        String jwt = jwtUtils.generateJwt(user.getId(), user.getEmail());
-//        response.addHeader(ticketingProperties.security.authHeaderName, jwt);
-//        var currentUserResponse = jwtUtils.verifyJwt(jwt);
-        return new UserResponse("", new CurrentUserResponse.CurrentUser(user.getId(), user.getEmail(), new Date()));
+    private UserResponse userResponse(AppUser user) {
+        return new UserResponse(new CurrentUser(user.getId(), user.getEmail(), Instant.now().toString()));
     }
 
 }

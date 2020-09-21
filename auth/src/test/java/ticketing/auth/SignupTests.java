@@ -5,12 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.autoconfigure.TicketingProperties;
-import ticketing.common.jwt.JwtUtils;
 import ticketing.common.test.MockMvcSetup;
 
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -21,8 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SignupTests {
     @Autowired
     MockMvc mvc;
-    @Autowired
-    JwtUtils jwtUtils;
     private static final String PATH = "/api/users/signup";
     private final TicketingProperties props = new TicketingProperties();
 
@@ -102,25 +97,13 @@ class SignupTests {
         String content = String.format("""
                 {"email": "%s", "password": "asdf"}
                 """, email);
-        var response = mvc.perform(post(PATH)
+        mvc.perform(post(PATH)
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andExpect(jsonPath("$.jwt").exists())
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andExpect(jsonPath("$.currentUser.id").exists())
                 .andExpect(jsonPath("$.currentUser.email").value(email))
                 .andExpect(jsonPath("$.currentUser.iat").exists())
-                .andDo(print())
-                .andReturn()
-                .getResponse();
-        var jwt = response.getHeader(props.security.authHeaderName);
-        assertNotNull(jwt);
-        assertNotNull(jwtUtils);
-
-        var currentUserResponse = jwtUtils.verifyJwt(jwt);
-        System.out.println(currentUserResponse);
-        assertNotNull(currentUserResponse.getCurrentUser());
-        var currentUser = currentUserResponse.getCurrentUser();
-        assertEquals("asdf@asdf.com", currentUser.getEmail());
+                .andDo(print());
     }
 }

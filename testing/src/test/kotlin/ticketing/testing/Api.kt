@@ -31,6 +31,32 @@ data class OrderResponse(
     )
 }
 
+data class OAuthTokenResponse(
+        val access_token: String,
+        val currentUser: CurrentUser,
+        val expires_in: Long,
+        val jti: String,
+        val refresh_token: String,
+        val scope: String,
+        val token_type: String
+)
+
+data class OAuthCheckTokenResponse(
+        val active: Boolean,
+        val authorities: List<String>,
+        val client_id: String,
+        val currentUser: CurrentUser,
+        val exp: Long,
+        val jti: String,
+        val scope: List<String>,
+        val user_name: String
+)
+
+data class InvalidGrantResponse(
+        val error: String,
+        val error_description: String
+)
+
 data class OrdersResponse(val orders: List<OrderResponse>)
 data class PaymentRequest(
         val token: String,
@@ -40,9 +66,6 @@ data class PaymentRequest(
 data class PaymentResponse(val id: String)
 
 interface Api {
-
-    @GET("/api/ping")
-    fun ping(): Call<String>
 
     @GET("/api/users/currentuser")
     fun getCurrentUser(): Call<CurrentUserResponse>
@@ -91,6 +114,19 @@ interface Api {
     @POST("/api/payments")
     fun postPayment(@Body paymentRequest: PaymentRequest,
                     @Header("x-auth-info") authInfo: String): Call<PaymentResponse>
+
+    @POST("/oauth/token?grant_type=password&scope=read")
+    fun oauthToken(@Header("authorization") authorization: String,
+                   @Query("username") username: String,
+                   @Query("password") password: String): Call<OAuthTokenResponse>
+
+    @POST("/oauth/token?grant_type=refresh_token&scope=read")
+    fun oauthRefresh(@Header("authorization") authorization: String,
+                     @Query("refresh_token") refreshToken: String): Call<OAuthTokenResponse>
+
+    @POST("/oauth/check_token")
+    fun oauthCheckToken(@Header("authorization") authorization: String,
+                        @Query("token") token: String): Call<OAuthCheckTokenResponse>
 
     companion object {
         private const val DEFAULT_BASE_URL = "http://localhost:8080"

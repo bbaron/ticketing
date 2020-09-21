@@ -3,6 +3,7 @@ package ticketing.common.jwt;
 
 import java.util.Date;
 
+@Deprecated
 public class CurrentUserResponse {
     private final CurrentUser currentUser;
 
@@ -24,6 +25,7 @@ public class CurrentUserResponse {
 
     public static final CurrentUserResponse NONE = new CurrentUserResponse();
 
+    @Deprecated
     public static class CurrentUser {
         private final String id, email;
         private final Date iat;
