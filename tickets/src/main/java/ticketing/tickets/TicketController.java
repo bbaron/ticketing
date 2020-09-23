@@ -5,13 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ticketing.common.oauth.CurrentUser;
 import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
 import ticketing.common.exceptions.NotFoundException;
 import ticketing.common.exceptions.RequestValidationException;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
@@ -50,11 +50,13 @@ public class TicketController {
     }
 
     @PostMapping
-    ResponseEntity<TicketResponse> create(@RequestBody @Valid TicketRequest request, BindingResult result, Principal principal) {
+    ResponseEntity<TicketResponse> create(@RequestBody @Valid TicketRequest request, BindingResult result,
+                                          CurrentUser currentUser) {
         if (result.hasErrors()) {
             throw new RequestValidationException(result);
         }
-        var ticket = Ticket.of(request.getTitle(), request.getPrice(), principal.getName());
+        logger.info("currentUser: {}", currentUser);
+        var ticket = Ticket.of(request.getTitle(), request.getPrice(), currentUser.getId());
         ticket = ticketRepository.insert(ticket);
         logger.info("saved {}", ticket);
         return status(CREATED).body(ticket.toTicketResponse());
@@ -63,7 +65,7 @@ public class TicketController {
     @PutMapping("/{id}")
     ResponseEntity<TicketResponse> update(@RequestBody @Valid TicketRequest request,
                                           BindingResult result,
-                                          @PathVariable String id, Principal principal) {
+                                          @PathVariable String id, CurrentUser currentUser) {
         if (result.hasErrors()) {
             throw new RequestValidationException(result);
         }
@@ -72,11 +74,11 @@ public class TicketController {
         if (ticket.reserved()) {
             throw new BadRequestException("Cannot edit a reserved ticket");
         }
-        if (!Objects.equals(ticket.getUserId(), principal.getName())) {
+        if (!Objects.equals(ticket.getUserId(), currentUser.getId())) {
             throw new ForbiddenException();
         }
         var updated = ticket.withTitle(request.getTitle())
-                       .withPrice(request.getPrice());
+                            .withPrice(request.getPrice());
         var saved = ticketRepository.save(updated);
         logger.info("updated {}", saved);
         return ok(saved.toTicketResponse());

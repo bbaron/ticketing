@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.tickets.messaging.publishers.TicketCreatedPublisher;
 import ticketing.tickets.messaging.publishers.TicketUpdatedPublisher;
@@ -18,11 +18,12 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ticketing.common.oauth.JwtTestUtils.createTestToken;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,14 +39,17 @@ class TicketUpdateTests {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    final Jwt jwt1 = createTestToken("asdf1@asdf.com");
+    final Jwt jwt2 = createTestToken("asdf2@asdf.com");
+
     @Test
     @DisplayName("returns a 404 if the ticket id does not exist")
-    @WithMockUser
     void test1() throws Exception {
         String content = """
                 {"title": "asdf", "price": 10}
                 """;
         mvc.perform(put("/api/tickets/{id}", "asdf")
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(content))
            .andDo(print())
@@ -67,7 +71,7 @@ class TicketUpdateTests {
                 {"title": "asdf", "price": 20}
                 """;
         var response = mvc.perform(post("/api/tickets")
-                .with(user("user1"))
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
                           .andDo(print())
@@ -78,7 +82,7 @@ class TicketUpdateTests {
         var ticket = objectMapper.readValue(response, Map.class);
 
         mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
-                .with(user("user2"))
+                .with(jwt().jwt(jwt2))
                 .contentType(APPLICATION_JSON)
                 .content(request))
            .andDo(print())
@@ -87,13 +91,12 @@ class TicketUpdateTests {
 
     @Test
     @DisplayName("returns an error on invalid title")
-    @WithMockUser
     void test4() throws Exception {
         String request = """
                 {"title": "asdf", "price": 20}
                 """;
         var response = mvc.perform(post("/api/tickets")
-                .with(user("user1"))
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
                           .andDo(print())
@@ -115,13 +118,12 @@ class TicketUpdateTests {
 
     @Test
     @DisplayName("returns an error on invalid price")
-    @WithMockUser
     void test5() throws Exception {
         String request = """
                 {"title": "asdf", "price": 20}
                 """;
         var response = mvc.perform(post("/api/tickets")
-                .with(user("user1"))
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
                           .andDo(print())
@@ -135,6 +137,7 @@ class TicketUpdateTests {
                 {"price": -10, "title": "asdf"}
                 """;
         mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
            .andDo(print())
@@ -143,12 +146,12 @@ class TicketUpdateTests {
 
     @Test
     @DisplayName("updates the ticket on valid inputs and publishes event")
-    @WithMockUser
     void test6() throws Exception {
         String request = """
                 {"title": "asdf", "price": 20}
                 """;
         var response = mvc.perform(post("/api/tickets")
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
                           .andDo(print())
@@ -162,6 +165,7 @@ class TicketUpdateTests {
                 {"title": "%s", "price": 30}
                 """.formatted(title);
         mvc.perform(put("/api/tickets/{id}", ticket.get("id"))
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
            .andDo(print())
@@ -171,12 +175,12 @@ class TicketUpdateTests {
 
     @Test
     @DisplayName("rejects updates if ticket is reserved")
-    @WithMockUser
     void test7() throws Exception {
         String request = """
                 {"title": "asdf", "price": 20}
                 """;
         var response = mvc.perform(post("/api/tickets")
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
                           .andDo(print())
@@ -185,7 +189,8 @@ class TicketUpdateTests {
                           .getResponse()
                           .getContentAsString();
         var ticketId = objectMapper.readValue(response, Map.class)
-                                   .get("id").toString();
+                                   .get("id")
+                                   .toString();
         var ticket = ticketRepository.findById(ticketId)
                                      .orElseThrow()
                                      .withOrderId(ObjectId.get()
@@ -196,6 +201,7 @@ class TicketUpdateTests {
                 {"title": "qwerty", "price": 200}
                 """;
         mvc.perform(put("/api/tickets/{id}", ticketId)
+                .with(jwt().jwt(jwt1))
                 .contentType(APPLICATION_JSON)
                 .content(request))
            .andDo(print())

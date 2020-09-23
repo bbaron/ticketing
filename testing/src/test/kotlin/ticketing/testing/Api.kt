@@ -84,36 +84,36 @@ interface Api {
 
     @POST("/api/tickets")
     fun postTicket(@Body ticketRequest: TicketRequest,
-                   @Header("x-auth-info") authInfo: String): Call<TicketResponse>
+                   @Header("authorization") bearerToken: String): Call<TicketResponse>
 
     @PUT("/api/tickets/{id}")
     fun putTicket(@Path("id") id: String,
                   @Body ticketRequest: TicketRequest,
-                  @Header("x-auth-info") authInfo: String): Call<TicketResponse>
+                  @Header("authorization") bearerToken: String): Call<TicketResponse>
 
     @POST("/api/orders")
     fun postOrder(@Body orderRequest: OrderRequest,
-                  @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+                  @Header("authorization") bearerToken: String): Call<OrderResponse>
 
     @POST("/api/orders")
     fun postOrder(@Body orderRequest: OrderRequest,
-                  @Header("x-auth-info") authInfo: String,
+                  @Header("authorization") bearerToken: String,
                   @Query("expiration") expiration: String): Call<OrderResponse>
 
     @GET("/api/orders")
-    fun getOrders(@Header("x-auth-info") authInfo: String): Call<OrdersResponse>
+    fun getOrders(@Header("authorization") bearerToken: String): Call<OrdersResponse>
 
     @GET("/api/orders/{id}")
     fun getOrder(@Path("id") id: String,
-                 @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+                 @Header("authorization") bearerToken: String): Call<OrderResponse>
 
     @DELETE("/api/orders/{id}")
     fun cancelOrder(@Path("id") id: String,
-                    @Header("x-auth-info") authInfo: String): Call<OrderResponse>
+                    @Header("authorization") bearerToken: String): Call<OrderResponse>
 
     @POST("/api/payments")
     fun postPayment(@Body paymentRequest: PaymentRequest,
-                    @Header("x-auth-info") authInfo: String): Call<PaymentResponse>
+                    @Header("authorization") bearerToken: String): Call<PaymentResponse>
 
     @POST("/oauth/token?grant_type=password&scope=read")
     fun oauthToken(@Header("authorization") authorization: String,

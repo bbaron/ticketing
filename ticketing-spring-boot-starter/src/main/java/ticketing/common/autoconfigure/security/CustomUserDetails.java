@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+@Deprecated
 public class CustomUserDetails implements UserDetails {
     private final String userId;
     private final Date iat;

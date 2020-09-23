@@ -8,9 +8,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.boot.test.json.GsonTester
 import retrofit2.Call
-import java.lang.Thread.sleep
 import java.util.*
-import kotlin.random.Random
 
 @TestMethodOrder(OrderAnnotation::class)
 class ApiIT {
@@ -18,6 +16,7 @@ class ApiIT {
     private val faker = Faker()
     private val userRequest = randomUser()
     private lateinit var userResponse: UserResponse
+    private lateinit var userToken: String
     private lateinit var invalidGrantResponseTester: GsonTester<InvalidGrantResponse>
 
     companion object {
@@ -50,7 +49,6 @@ class ApiIT {
     @Test
     @Order(20)
     @DisplayName("get all tickets does not require auth")
-    @Disabled
     internal fun `get all tickets does not require auth`() {
         val response = api.getTickets().execute()
         assertThat(response.isSuccessful).isTrue()
@@ -59,7 +57,6 @@ class ApiIT {
     @Test
     @Order(24)
     @DisplayName("get all tickets are all available")
-    @Disabled
     internal fun `get all tickets are all available`() {
         val response = api.getTickets().execute()
         assertThat(response.isSuccessful).isTrue()
@@ -80,7 +77,7 @@ class ApiIT {
 
     @Test
     @Order(40)
-    @DisplayName("random user may signup")
+    @DisplayName("random user may signup and signin")
     internal fun `random user may signup`() {
         val response = api.signup(userRequest).execute()
         assertThat(response.code()).isEqualTo(201)
@@ -90,6 +87,16 @@ class ApiIT {
                 { assertThat(userResponse.currentUser.id).isNotBlank() }
         )
         this.userResponse = userResponse
+        val response2 = oauthToken(userRequest).execute()
+        assertThat(response2.code()).isEqualTo(200)
+        val oauthResponse = response2.body() ?: fail("/oauth/token failed")
+        assertAll(
+                { assertThat(oauthResponse.currentUser.email).isEqualTo(userRequest.email) },
+                { assertThat(oauthResponse.currentUser.id).isNotBlank() },
+                { assertThat(oauthResponse.access_token).isNotBlank() },
+                { assertThat(oauthResponse.refresh_token).isNotBlank() }
+        )
+        userToken = oauthResponse.access_token
     }
 
 
@@ -99,32 +106,39 @@ class ApiIT {
     inner class RequiresAuth {
         private lateinit var ticketResponse: TicketResponse
         private lateinit var orderResponse: OrderResponse
-        private lateinit var ticketSeller: UserResponse
-        private lateinit var ticketBuyer: UserResponse
-        private lateinit var anotherUser: UserResponse
+//        private lateinit var ticketSeller: UserResponse
+        private lateinit var ticketSellerToken: String
+//        private lateinit var ticketBuyer: UserResponse
+        private lateinit var ticketBuyerToken: String
+//        private lateinit var anotherUser: UserResponse
+        private lateinit var anotherUserToken: String
 
         @BeforeAll
         internal fun setUp() {
             assumeThat(this@ApiIT::userResponse.isInitialized).isTrue()
-            ticketSeller = userResponse
-            ticketBuyer = signupRandomUser()
-            anotherUser = signupRandomUser()
+//            ticketSeller = userResponse
+            ticketSellerToken = userToken
+//            ticketBuyer = signupRandomUser()
+//            anotherUser = signupRandomUser()
+            ticketBuyerToken = oauthRandomUser()
+            ticketSellerToken = oauthRandomUser()
+            anotherUserToken = oauthRandomUser()
         }
 
-        @Test
-        @Order(10)
-        @DisplayName("oauth token is successful")
-        internal fun `oauth token is successful`() {
-            val response = oauthToken(userRequest).execute()
-            assertThat(response.code()).isEqualTo(200)
-            val oauthResponse = response.body() ?: fail("/oauth/token failed")
-            assertAll(
-                    { assertThat(oauthResponse.currentUser.email).isEqualTo(userRequest.email) },
-                    { assertThat(oauthResponse.currentUser.id).isNotBlank() },
-                    { assertThat(oauthResponse.access_token).isNotBlank() },
-                    { assertThat(oauthResponse.refresh_token).isNotBlank() }
-            )
-        }
+//        @Test
+//        @Order(10)
+//        @DisplayName("oauth token is successful")
+//        internal fun `oauth token is successful`() {
+//            val response = oauthToken(userRequest).execute()
+//            assertThat(response.code()).isEqualTo(200)
+//            val oauthResponse = response.body() ?: fail("/oauth/token failed")
+//            assertAll(
+//                    { assertThat(oauthResponse.currentUser.email).isEqualTo(userRequest.email) },
+//                    { assertThat(oauthResponse.currentUser.id).isNotBlank() },
+//                    { assertThat(oauthResponse.access_token).isNotBlank() },
+//                    { assertThat(oauthResponse.refresh_token).isNotBlank() }
+//            )
+//        }
 
         @Test
         @Order(11)
@@ -179,10 +193,9 @@ class ApiIT {
         @Test
         @Order(20)
         @DisplayName("create new ticket is successful")
-        @Disabled
         internal fun `create new ticket is successful`() {
             val ticketRequest = randomTicketRequest()
-            val ticketResponse = createTicket(ticketSeller, ticketRequest)
+            val ticketResponse = createTicket(ticketSellerToken, ticketRequest)
             assertAll(
                     { assertThat(ticketResponse.title).isEqualTo(ticketRequest.title) },
                     { assertThat(ticketResponse.price).isEqualTo(ticketRequest.price) },
@@ -194,7 +207,6 @@ class ApiIT {
         @Test
         @Order(30)
         @DisplayName("may get the ticket")
-        @Disabled
         internal fun `may get the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
             val response = api.getTicket(ticketResponse.id).execute()
@@ -206,11 +218,10 @@ class ApiIT {
         @Test
         @Order(40)
         @DisplayName("may update the ticket")
-        @Disabled
         internal fun `may update the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
             val ticketRequest = randomTicketRequest()
-            val response = api.putTicket(ticketResponse.id, ticketRequest, ticketSeller.jwt).execute()
+            val response = api.putTicket(ticketResponse.id, ticketRequest, authHeader(ticketSellerToken)).execute()
             assertThat(response.code()).isEqualTo(200)
             val putTicket = response.body() ?: fail("PUT ticket failed")
             assertThat(putTicket.title).isEqualTo(ticketRequest.title)
@@ -220,11 +231,10 @@ class ApiIT {
         @Test
         @Order(50)
         @DisplayName("another user MAY NOT update the ticket")
-        @Disabled
         internal fun `another user MAY NOT update the ticket`() {
             assumeThat(this::ticketResponse.isInitialized).isTrue()
             val ticketRequest = TicketRequest(faker.rockBand().name(), faker.number().numberBetween(10, 1000))
-            val response = api.putTicket(ticketResponse.id, ticketRequest, anotherUser.jwt).execute()
+            val response = api.putTicket(ticketResponse.id, ticketRequest, authHeader(anotherUserToken)).execute()
             assertThat(response.code()).isEqualTo(403)
         }
 
@@ -233,18 +243,18 @@ class ApiIT {
         @DisplayName("create new order is successful")
         @Disabled
         internal fun `create new order is successful`() {
-            val ticket = createTicket(ticketSeller)
-            val orderResponse = createOrder(ticket, ticketBuyer)
-            assertAll(
-                    { assertThat(orderResponse.status).isEqualTo("Created") },
-                    { assertThat(orderResponse.userId).isEqualTo(ticketBuyer.currentUser.id) },
-                    { assertThat(orderResponse.ticket.id).isEqualTo(ticket.id) },
-                    { assertThat(orderResponse.id).isNotBlank() }
-            )
-            sleep(1000)
-            val orderedTicket = api.getTicket(ticket.id).execute().body()!!
-            assertThat(orderedTicket.reserved).isTrue()
-            this.orderResponse = orderResponse
+//            val ticket = createTicket(ticketSeller)
+//            val orderResponse = createOrder(ticket, ticketBuyer)
+//            assertAll(
+//                    { assertThat(orderResponse.status).isEqualTo("Created") },
+//                    { assertThat(orderResponse.userId).isEqualTo(ticketBuyer.currentUser.id) },
+//                    { assertThat(orderResponse.ticket.id).isEqualTo(ticket.id) },
+//                    { assertThat(orderResponse.id).isNotBlank() }
+//            )
+//            sleep(1000)
+//            val orderedTicket = api.getTicket(ticket.id).execute().body()!!
+//            assertThat(orderedTicket.reserved).isTrue()
+//            this.orderResponse = orderResponse
         }
 
         @Test
@@ -252,11 +262,11 @@ class ApiIT {
         @DisplayName("may get the order")
         @Disabled
         internal fun `may get the order`() {
-            assumeThat(this::orderResponse.isInitialized).isTrue()
-            val response = api.getOrder(orderResponse.id, ticketBuyer.jwt).execute()
-            assertThat(response.code()).isEqualTo(200)
-            val gottenOrder = response.body() ?: fail("GET order failed")
-            assertThat(gottenOrder.id).isEqualTo(this.orderResponse.id)
+//            assumeThat(this::orderResponse.isInitialized).isTrue()
+//            val response = api.getOrder(orderResponse.id, ticketBuyer.jwt).execute()
+//            assertThat(response.code()).isEqualTo(200)
+//            val gottenOrder = response.body() ?: fail("GET order failed")
+//            assertThat(gottenOrder.id).isEqualTo(this.orderResponse.id)
         }
 
         @Test
@@ -264,9 +274,9 @@ class ApiIT {
         @DisplayName("another user MAY NOT get the order")
         @Disabled
         internal fun `another user MAY NOT get the order`() {
-            assumeThat(this::orderResponse.isInitialized).isTrue()
-            val response = api.getOrder(orderResponse.id, anotherUser.jwt).execute()
-            assertThat(response.code()).isEqualTo(403)
+//            assumeThat(this::orderResponse.isInitialized).isTrue()
+//            val response = api.getOrder(orderResponse.id, anotherUser.jwt).execute()
+//            assertThat(response.code()).isEqualTo(403)
         }
 
         @Test
@@ -274,12 +284,12 @@ class ApiIT {
         @DisplayName("may cancel the order")
         @Disabled
         internal fun `may cancel the order`() {
-            val order = createOrder(createTicket(ticketSeller), ticketBuyer)
-            val response = api.cancelOrder(order.id, ticketBuyer.jwt).execute()
-            assertThat(response.code()).isEqualTo(200)
-            val cancelledOrder = response.body() ?: fail("DELETE order failed")
-            assertThat(cancelledOrder.id).isEqualTo(order.id)
-            assertThat(cancelledOrder.status).isEqualTo("Cancelled")
+//            val order = createOrder(createTicket(ticketSeller), ticketBuyer)
+//            val response = api.cancelOrder(order.id, ticketBuyer.jwt).execute()
+//            assertThat(response.code()).isEqualTo(200)
+//            val cancelledOrder = response.body() ?: fail("DELETE order failed")
+//            assertThat(cancelledOrder.id).isEqualTo(order.id)
+//            assertThat(cancelledOrder.status).isEqualTo("Cancelled")
         }
 
         @Test
@@ -287,9 +297,9 @@ class ApiIT {
         @DisplayName("another user MAY NOT cancel the order")
         @Disabled
         internal fun `another user MAY NOT cancel the order`() {
-            val order = createOrder(createTicket(ticketSeller), ticketBuyer)
-            val response = api.cancelOrder(order.id, anotherUser.jwt).execute()
-            assertThat(response.code()).isEqualTo(403)
+//            val order = createOrder(createTicket(ticketSeller), ticketBuyer)
+//            val response = api.cancelOrder(order.id, anotherUser.jwt).execute()
+//            assertThat(response.code()).isEqualTo(403)
         }
 
         @Test
@@ -297,17 +307,17 @@ class ApiIT {
         @DisplayName("may get own orders only")
         @Disabled
         internal fun `may get own orders only`() {
-            val user = signupRandomUser()
-            val user2 = signupRandomUser()
-            createOrder(createTicket(ticketSeller), user)
-            createOrder(createTicket(ticketSeller), user)
-            createOrder(createTicket(ticketSeller), user)
-            createOrder(createTicket(ticketSeller), user2)
-            createOrder(createTicket(ticketSeller), user2)
-            val response = api.getOrders(user.jwt).execute()
-            assertThat(response.code()).isEqualTo(200)
-            val orders = response.body()?.orders ?: fail("GET orders failed")
-            assertThat(orders).allMatch { it.userId == user.currentUser.id }
+//            val user = signupRandomUser()
+//            val user2 = signupRandomUser()
+//            createOrder(createTicket(ticketSeller), user)
+//            createOrder(createTicket(ticketSeller), user)
+//            createOrder(createTicket(ticketSeller), user)
+//            createOrder(createTicket(ticketSeller), user2)
+//            createOrder(createTicket(ticketSeller), user2)
+//            val response = api.getOrders(user.jwt).execute()
+//            assertThat(response.code()).isEqualTo(200)
+//            val orders = response.body()?.orders ?: fail("GET orders failed")
+//            assertThat(orders).allMatch { it.userId == user.currentUser.id }
         }
 
         @Test
@@ -315,10 +325,10 @@ class ApiIT {
         @DisplayName("may not order ticket already reserved")
         @Disabled
         internal fun `may not order ticket already reserved`() {
-            val ticket = createTicket(ticketSeller)
-            createOrder(ticket, ticketBuyer)
-            val response = api.postOrder(OrderRequest(ticket.id), anotherUser.jwt).execute()
-            assertThat(response.code()).isEqualTo(400)
+//            val ticket = createTicket(ticketSeller)
+//            createOrder(ticket, ticketBuyer)
+//            val response = api.postOrder(OrderRequest(ticket.id), anotherUser.jwt).execute()
+//            assertThat(response.code()).isEqualTo(400)
         }
 
         @Test
@@ -326,15 +336,15 @@ class ApiIT {
         @DisplayName("order and wait for it to expire")
         @Disabled
         internal fun `order and wait for it to expire`() {
-            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
-            val millis = 2000L
-            println("waiting for order $orderId to expire")
-            sleep(millis)
-            println("waited $millis millis for order $orderId to expire")
-            val order = api.getOrder(orderId, ticketBuyer.jwt)
-                    .execute()
-                    .body()!!
-            assertThat(order.status).isEqualTo("Cancelled")
+//            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
+//            val millis = 2000L
+//            println("waiting for order $orderId to expire")
+//            sleep(millis)
+//            println("waited $millis millis for order $orderId to expire")
+//            val order = api.getOrder(orderId, ticketBuyer.jwt)
+//                    .execute()
+//                    .body()!!
+//            assertThat(order.status).isEqualTo("Cancelled")
         }
 
         @Test
@@ -343,17 +353,17 @@ class ApiIT {
         @Disabled
         internal fun `order a random ticket from the landing page`() {
 
-            val tickets = api.getTickets().execute().body()?.tickets ?: fail("GET tickets failed")
-            val ticket = tickets[Random.nextInt(tickets.size)]
-            val orderId = createOrder(ticket, ticketBuyer, "1").id
-            val millis = 2000L
-            println("waiting for order $orderId to expire")
-            sleep(millis)
-            println("waited $millis millis for order $orderId to expire")
-            val order = api.getOrder(orderId, ticketBuyer.jwt)
-                    .execute()
-                    .body()!!
-            assertThat(order.status).isEqualTo("Cancelled")
+//            val tickets = api.getTickets().execute().body()?.tickets ?: fail("GET tickets failed")
+//            val ticket = tickets[Random.nextInt(tickets.size)]
+//            val orderId = createOrder(ticket, ticketBuyer, "1").id
+//            val millis = 2000L
+//            println("waiting for order $orderId to expire")
+//            sleep(millis)
+//            println("waited $millis millis for order $orderId to expire")
+//            val order = api.getOrder(orderId, ticketBuyer.jwt)
+//                    .execute()
+//                    .body()!!
+//            assertThat(order.status).isEqualTo("Cancelled")
         }
 
         @Test
@@ -361,16 +371,16 @@ class ApiIT {
         @DisplayName("make payment on order")
         @Disabled
         internal fun `make payment on order`() {
-            val paymentApi = Api.create("http://localhost:8080")
-            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
-            println("make payment for order $orderId")
-            val paymentRequest = PaymentRequest("tok_visa", orderId)
-            val response = paymentApi.postPayment(paymentRequest, ticketBuyer.jwt).execute()
-            assertThat(response.code()).isEqualTo(201)
-            val order = api.getOrder(orderId, ticketBuyer.jwt)
-                    .execute()
-                    .body()!!
-            assertThat(order.status).isEqualTo("Completed")
+//            val paymentApi = Api.create("http://localhost:8080")
+//            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
+//            println("make payment for order $orderId")
+//            val paymentRequest = PaymentRequest("tok_visa", orderId)
+//            val response = paymentApi.postPayment(paymentRequest, ticketBuyer.jwt).execute()
+//            assertThat(response.code()).isEqualTo(201)
+//            val order = api.getOrder(orderId, ticketBuyer.jwt)
+//                    .execute()
+//                    .body()!!
+//            assertThat(order.status).isEqualTo("Completed")
         }
     }
 
@@ -387,9 +397,15 @@ class ApiIT {
         return response.body() ?: fail("Signup failed")
     }
 
-    private fun createTicket(user: UserResponse,
+    private fun oauthRandomUser(): String {
+        val userRequest = randomUser()
+        api.signup(userRequest).execute()
+        return oauthToken(userRequest).execute().body()!!.access_token
+    }
+
+    private fun createTicket(token: String,
                              ticketRequest: TicketRequest = randomTicketRequest()): TicketResponse {
-        val response = api.postTicket(ticketRequest, user.jwt).execute()
+        val response = api.postTicket(ticketRequest, authHeader(token)).execute()
         assertThat(response.code()).isEqualTo(201)
         return response.body() ?: fail("POST ticket failed")
     }
@@ -403,6 +419,10 @@ class ApiIT {
         assertThat(response.code()).isEqualTo(201)
         return response.body() ?: fail("POST order failed")
     }
+
+    private fun authHeader(token: String) : String =
+            "Bearer $token"
+
 
     fun oauthToken(userRequest: UserRequest): Call<OAuthTokenResponse> =
             api.oauthToken(CLIENT_CREDENTIALS, userRequest.email, userRequest.password)

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ticketing.common.autoconfigure.security.CurrentUser;
+import ticketing.common.oauth.CurrentUser;
 import ticketing.common.exceptions.RequestValidationException;
 
 import javax.servlet.http.HttpServletResponse;

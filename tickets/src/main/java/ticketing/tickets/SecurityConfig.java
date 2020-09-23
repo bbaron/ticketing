@@ -6,7 +6,8 @@ import ticketing.common.autoconfigure.security.HttpSecurityCustomizer;
 
 import static org.springframework.http.HttpMethod.*;
 
-@Component
+//@Component
+@Deprecated
 public class SecurityConfig implements HttpSecurityCustomizer {
 
 

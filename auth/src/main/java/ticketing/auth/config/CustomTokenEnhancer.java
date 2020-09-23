@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.stereotype.Component;
 import ticketing.auth.AppUser;
-import ticketing.common.autoconfigure.security.CurrentUser;
+import ticketing.common.oauth.CurrentUser;
 
 import java.time.Instant;
 import java.util.Map;

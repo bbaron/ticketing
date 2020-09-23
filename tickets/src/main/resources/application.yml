@@ -12,6 +12,7 @@ logging:
   level:
     org:
       springframework:
+        security: TRACE
         web:
           servlet:
             view:

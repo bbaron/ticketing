@@ -1,7 +1,7 @@
 package ticketing.auth;
 
 import lombok.Value;
-import ticketing.common.autoconfigure.security.CurrentUser;
+import ticketing.common.oauth.CurrentUser;
 
 @Value
 public class UserResponse {

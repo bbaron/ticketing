@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.test.MockMvcSetup;
@@ -16,10 +17,12 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ticketing.common.oauth.JwtTestUtils.createTestToken;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @MockMvcSetup
@@ -28,6 +31,8 @@ class TicketCreateTests {
     final MockMvc mvc;
     final MessageIO messageIO;
     final ObjectMapper objectMapper;
+    final Jwt jwt = createTestToken("asdf@asdf.com");
+
 
     @Autowired
     TicketCreateTests(MockMvc mvc, MessageIO messageIO, ObjectMapper objectMapper) {
@@ -40,8 +45,8 @@ class TicketCreateTests {
     @DisplayName("has a route handler listening /api/tickets for post requests")
     void test1() throws Exception {
         mvc.perform(get("/api/tickets"))
-                .andDo(print())
-                .andExpect(status().is(not(404)));
+           .andDo(print())
+           .andExpect(status().is(not(404)));
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
@@ -49,8 +54,8 @@ class TicketCreateTests {
     @DisplayName("only be access if the user is signed in")
     void test2() throws Exception {
         mvc.perform(post("/api/tickets/"))
-                .andDo(print())
-                .andExpect(status().is(403));
+           .andDo(print())
+           .andExpect(status().is(403));
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
@@ -58,9 +63,10 @@ class TicketCreateTests {
     @DisplayName("returns non 403 on sign in")
     @WithMockUser
     void test3() throws Exception {
-        mvc.perform(post("/api/tickets"))
-                .andDo(print())
-                .andExpect(status().is(not(403)));
+        mvc.perform(post("/api/tickets")
+                .with(jwt().jwt(jwt)))
+           .andDo(print())
+           .andExpect(status().is(not(403)));
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
@@ -74,16 +80,16 @@ class TicketCreateTests {
         mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
         content = """
                 {"price": 10}
                 """;
         mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
@@ -97,22 +103,21 @@ class TicketCreateTests {
         mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
         content = """
                 {"title": "asdf", "price": -10}
                 """;
         mvc.perform(post("/api/tickets")
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is4xxClientError());
+           .andDo(print())
+           .andExpect(status().is4xxClientError());
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 
     @Test
     @DisplayName("creates a ticket on valid inputs")
-    @WithMockUser
     void test6() throws Exception {
         var title = "asdf";
         double price = 20;
@@ -120,12 +125,13 @@ class TicketCreateTests {
                 {"title": "%s", "price": %s}
                 """.formatted(title, price);
         mvc.perform(post("/api/tickets")
+                .with(jwt().jwt(jwt))
                 .contentType(APPLICATION_JSON)
                 .content(content))
-                .andDo(print())
-                .andExpect(status().is(201));
+           .andDo(print())
+           .andExpect(status().is(201));
 
-        var message = messageIO.output.receive(5,"ticketCreated");
+        var message = messageIO.output.receive(5, "ticketCreated");
         var payload = objectMapper.readValue(message.getPayload(), TicketCreatedMessage.class);
         assertEquals(title, payload.getTitle());
     }

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 
+@Deprecated
 public class CustomAuthenticationDetails extends WebAuthenticationDetails implements GrantedAuthoritiesContainer {
     private static final List<GrantedAuthority> roles = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 

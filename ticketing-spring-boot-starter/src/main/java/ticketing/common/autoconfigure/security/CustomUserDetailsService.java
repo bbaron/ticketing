@@ -9,6 +9,7 @@ import ticketing.common.jwt.JwtUtils;
 
 import java.util.Collection;
 
+@Deprecated
 public class CustomUserDetailsService extends PreAuthenticatedGrantedAuthoritiesUserDetailsService {
     private final JwtUtils jwtUtils;
 

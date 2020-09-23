@@ -1,4 +1,4 @@
-package ticketing.common.autoconfigure.security;
+package ticketing.common.oauth;
 
 import lombok.Value;
 
