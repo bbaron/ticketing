@@ -1,4 +1,4 @@
-package ticketing.common.autoconfigure.web;
+package ticketing.common.autoconfigure;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

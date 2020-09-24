@@ -1,4 +1,4 @@
-package ticketing.common.autoconfigure.security;
+package ticketing.common.autoconfigure;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Configuration;
