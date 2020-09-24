@@ -9,10 +9,12 @@ public final class JwtTestUtils {
     private JwtTestUtils() {
         throw new Error();
     }
-
     public static Jwt createTestToken(String email) {
-        var id = ObjectId.get()
-                         .toHexString();
+        return createTestToken(email, ObjectId.get()
+                                              .toHexString());
+    }
+
+    public static Jwt createTestToken(String email, String id) {
         var currentUser = new CurrentUser(id, email, Instant.now()
                                                             .toString());
         return Jwt.withTokenValue("token")

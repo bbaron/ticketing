@@ -12,6 +12,7 @@ import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
 import ticketing.common.exceptions.NotFoundException;
 import ticketing.common.exceptions.RequestValidationException;
+import ticketing.common.oauth.CurrentUser;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -37,13 +38,13 @@ public class PaymentsController {
     @PostMapping
     ResponseEntity<PaymentResponse> create(@RequestBody @Valid PaymentRequest paymentRequest,
                                            BindingResult bindingResult,
-                                           Principal principal) {
+                                           CurrentUser currentUser) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
         var order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(NotFoundException::new);
-        if (!Objects.equals(order.getUserId(), principal.getName())) {
+        if (!Objects.equals(order.getUserId(), currentUser.getId())) {
             throw new ForbiddenException();
         }
         if (order.getStatus().isCancelled()) {

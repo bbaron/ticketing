@@ -45,12 +45,9 @@ class ApiIT {
     @Test
     @Order(10)
     @DisplayName("currentuser with no auth info returns null user")
-    @Disabled
     internal fun `currentuser with no auth info returns null user`() {
-        val response = api.getCurrentUser().execute()
-        assertThat(response.isSuccessful).isTrue()
-        val body: CurrentUserResponse? = response.body()
-        assertThat(body?.currentUser).isNull()
+        val response = oauthCheckToken("").execute()
+        assertThat(response.code()).isEqualTo(400)
     }
 
     @Test
@@ -75,11 +72,10 @@ class ApiIT {
     @Test
     @Order(30)
     @DisplayName("unregistered user denied signin")
-    @Disabled
     internal fun `unregistered user denied signin`() {
         val user = randomUser()
-        val response = api.signin(user).execute()
-        assertThat(response.code()).isEqualTo(401)
+        val response = oauthToken(user).execute()
+        assertThat(response.code()).isEqualTo(400)
     }
 
     @Test
@@ -341,18 +337,18 @@ class ApiIT {
         @Test
         @Order(140)
         @DisplayName("make payment on order")
-        @Disabled
         internal fun `make payment on order`() {
-//            val paymentApi = Api.create("http://localhost:8080")
-//            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
-//            println("make payment for order $orderId")
-//            val paymentRequest = PaymentRequest("tok_visa", orderId)
-//            val response = paymentApi.postPayment(paymentRequest, ticketBuyer.jwt).execute()
-//            assertThat(response.code()).isEqualTo(201)
-//            val order = api.getOrder(orderId, ticketBuyer.jwt)
-//                    .execute()
-//                    .body()!!
-//            assertThat(order.status).isEqualTo("Completed")
+            val paymentApi = Api.create("http://localhost:8080")
+            val orderId = createOrder(createTicket(ticketSeller), ticketBuyer).id
+            println("make payment for order $orderId")
+            val paymentRequest = PaymentRequest("tok_visa", orderId)
+            val response = paymentApi.postPayment(paymentRequest, ticketBuyer.token).execute()
+            assertThat(response.code()).isEqualTo(201)
+            sleep(1000)
+            val order = api.getOrder(orderId, ticketBuyer.token)
+                    .execute()
+                    .body()!!
+            assertThat(order.status).isEqualTo("Completed")
         }
     }
 
@@ -362,12 +358,6 @@ class ApiIT {
     }
 
     private fun randomTicketRequest(): TicketRequest = TicketRequest(faker.rockBand().name(), faker.number().numberBetween(10, 1000))
-
-    private fun signupRandomUser(): UserResponse {
-        val userRequest = randomUser()
-        val response = api.signup(userRequest).execute()
-        return response.body() ?: fail("Signup failed")
-    }
 
     private fun oauthRandomUser(): Bearer {
         val userRequest = randomUser()

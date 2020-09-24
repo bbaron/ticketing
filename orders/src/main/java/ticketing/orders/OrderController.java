@@ -71,7 +71,11 @@ public class OrderController {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
         }
-        var ticket = ticketRepository.findById(orderRequest.getTicketId()).orElseThrow(NotFoundException::new);
+        var ticket = ticketRepository.findById(orderRequest.getTicketId()).orElse(null);
+        if (ticket == null) {
+            logger.warn("No ticket found request: {}", orderRequest);
+            throw new NotFoundException();
+        }
         boolean reserved = orderRepository.findByTicket(ticket)
                 .stream()
                 .anyMatch(o -> o.getStatus().isReserved());

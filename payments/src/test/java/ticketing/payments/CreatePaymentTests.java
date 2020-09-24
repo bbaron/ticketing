@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Example;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ticketing.common.test.MockMvcSetup;
@@ -22,10 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ticketing.common.oauth.JwtTestUtils.createTestToken;
 import static ticketing.messaging.types.OrderStatus.Cancelled;
 import static ticketing.messaging.types.OrderStatus.Created;
 import static ticketing.payments.Order.*;
@@ -46,9 +49,12 @@ class CreatePaymentTests {
     MessageIO messageIO;
     @Autowired
     ObjectMapper objectMapper;
+    final String userId = ObjectId.get()
+                                  .toHexString();
     final OrderBuilder orderBuilder = builder()
-            .userId(ObjectId.get().toHexString())
+            .userId(userId)
             .price(20);
+    final Jwt jwt = createTestToken("asdf@asdf.com", userId);
 
     @Test
     @DisplayName("return 404 when order does not exist")
@@ -59,6 +65,7 @@ class CreatePaymentTests {
                 "orderId": "%s"}
                 """.formatted(ObjectId.get().toHexString());
         mvc.perform(post("/api/payments")
+                .with(jwt().jwt(jwt))
                 .contentType(APPLICATION_JSON)
                 .content(content))
                 .andDo(print())
@@ -69,8 +76,8 @@ class CreatePaymentTests {
 
     @Test
     @DisplayName("return 403 when purchasing an order that doesn't belong to the user")
-    @WithMockUser
     void test2() throws Exception {
+        Jwt jwt2 = createTestToken("other@asdf.com");
         Order order = orderBuilder.status(Created).build();
         order = orderRepository.save(order);
         var content = """
@@ -78,6 +85,7 @@ class CreatePaymentTests {
                 "orderId": "%s"}
                 """.formatted(order.getId());
         mvc.perform(post("/api/payments")
+                .with(jwt().jwt(jwt2))
                 .contentType(APPLICATION_JSON)
                 .content(content))
                 .andDo(print())
@@ -95,7 +103,7 @@ class CreatePaymentTests {
                 "orderId": "%s"}
                 """.formatted(order.getId());
         mvc.perform(post("/api/payments")
-                .with(user(order.getUserId()))
+                .with(jwt().jwt(jwt))
                 .contentType(APPLICATION_JSON)
                 .content(content))
                 .andDo(print())
@@ -118,7 +126,7 @@ class CreatePaymentTests {
                 "orderId": "%s"}
                 """.formatted(order.getId());
         mvc.perform(post("/api/payments")
-                .with(user(order.getUserId()))
+                .with(jwt().jwt(jwt))
                 .contentType(APPLICATION_JSON)
                 .content(content))
                 .andDo(print())
