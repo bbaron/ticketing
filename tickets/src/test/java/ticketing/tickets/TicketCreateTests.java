@@ -55,7 +55,7 @@ class TicketCreateTests {
     void test2() throws Exception {
         mvc.perform(post("/api/tickets/"))
            .andDo(print())
-           .andExpect(status().is(403));
+           .andExpect(status().is(401));
         assertTrue(messageIO.neverReceived(0, "ticketCreated"));
     }
 

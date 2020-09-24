@@ -61,7 +61,7 @@ class TicketUpdateTests {
     void test2() throws Exception {
         mvc.perform(put("/api/tickets/{id}", "asdf"))
            .andDo(print())
-           .andExpect(status().is(403));
+           .andExpect(status().is(401));
     }
 
     @Test
