@@ -313,7 +313,6 @@ class ApiIT {
         @Test
         @Order(130)
         @DisplayName("order and wait for it to expire")
-        @Disabled
         internal fun `order and wait for it to expire`() {
             val orderId = createOrder(createTicket(ticketSeller), ticketBuyer, "1").id
             val millis = 3000L
