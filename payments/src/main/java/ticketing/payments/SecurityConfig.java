@@ -5,10 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.stereotype.Component;
 import ticketing.common.autoconfigure.TicketingProperties;
-import ticketing.common.autoconfigure.security.HttpSecurityCustomizer;
 import ticketing.common.oauth.ResourceServerConfigurerAdapter;
-
-import static org.springframework.http.HttpMethod.*;
 
 @Component
 public class SecurityConfig extends ResourceServerConfigurerAdapter {
