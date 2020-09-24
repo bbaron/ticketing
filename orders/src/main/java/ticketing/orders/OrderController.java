@@ -11,15 +11,15 @@ import ticketing.common.exceptions.BadRequestException;
 import ticketing.common.exceptions.ForbiddenException;
 import ticketing.common.exceptions.NotFoundException;
 import ticketing.common.exceptions.RequestValidationException;
+import ticketing.common.oauth.CurrentUser;
 import ticketing.messaging.types.OrderStatus;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNullElse;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -42,8 +42,8 @@ public class OrderController {
     }
 
     @GetMapping
-    OrdersResponse findAll(Principal principal) {
-        var orders = orderRepository.findByUserId(principal.getName())
+    OrdersResponse findAll(CurrentUser currentUser) {
+        var orders = orderRepository.findByUserId(currentUser.getId())
                 .stream()
                 .map(OrderResponse::of)
                 .collect(Collectors.toList());
@@ -51,9 +51,9 @@ public class OrderController {
     }
 
     @RequestMapping(path = "/{id}", method = {GET, DELETE})
-    OrderResponse findOrCancel(@PathVariable String id, Principal principal, HttpMethod method) {
+    OrderResponse findOrCancel(@PathVariable String id, CurrentUser currentUser, HttpMethod method) {
         var order = orderRepository.findById(id).orElseThrow(NotFoundException::new);
-        if (!Objects.equals(order.getUserId(), principal.getName())) {
+        if (!Objects.equals(order.getUserId(), currentUser.getId())) {
             throw new ForbiddenException();
         }
         if (method.equals(HttpMethod.DELETE)) {
@@ -66,7 +66,7 @@ public class OrderController {
     @PostMapping
     ResponseEntity<OrderResponse> create(@RequestBody @Valid OrderRequest orderRequest,
                                          BindingResult bindingResult,
-                                         Principal principal,
+                                         CurrentUser currentUser,
                                          @RequestParam(value = "expiration", required = false) Long expirationSeconds) {
         if (bindingResult.hasErrors()) {
             throw new RequestValidationException(bindingResult);
@@ -84,7 +84,7 @@ public class OrderController {
         long seconds = requireNonNullElse(expirationSeconds, expirationWindowSeconds);
         var expiration = Instant.now().plusSeconds(seconds);
         logger.info("expiration: " + expiration);
-        var userId = principal.getName();
+        var userId = currentUser.getId();
         var order = Order.of(userId, OrderStatus.Created, expiration, ticket);
         order = orderRepository.insert(order);
         logger.info("Saved " + order);
