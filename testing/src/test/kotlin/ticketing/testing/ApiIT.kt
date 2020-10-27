@@ -38,7 +38,9 @@ class ApiIT {
             GsonTester.initFields(this, gson)
             api.getCurrentUser().execute()
         } catch (e: Throwable) {
-            assumeThat(false).isTrue()
+            assumeThat(false)
+                    .`as`("the API is probably not running")
+                    .isTrue()
         }
     }
 
